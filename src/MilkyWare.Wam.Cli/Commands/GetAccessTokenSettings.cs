@@ -1,4 +1,5 @@
-﻿using Spectre.Console;
+﻿using System.ComponentModel;
+using Spectre.Console;
 using Spectre.Console.Cli;
 
 namespace MilkyWare.Wam.Cli.Commands
@@ -6,15 +7,19 @@ namespace MilkyWare.Wam.Cli.Commands
     public class GetAccessTokenSettings : LoggingSettings
     {
         [CommandOption("--clear-cache")]
+        [Description("Clear the token cache before acquiring a new token")]
         public bool ClearCache { get; set; }
 
         [CommandOption("-c|--client-id")]
+        [Description("Required. The client ID of the app reg")]
         public string? ClientId { get; set; }
 
         [CommandOption("-s|--scope <VALUES>")]
+        [Description("Optional. The scopes required for the token. Defaults to User.Read")]
         public string[] Scopes { get; set; } = ["User.Read"];
 
         [CommandOption("-t|--tenant-id")]
+        [Description("Optional. The tenant ID of the single tenancy App Reg")]
         public string? TenantId { get; set; }
 
         public override ValidationResult Validate()
