@@ -20,6 +20,6 @@ consolewambroker -c 00000000-0000-0000-0000-000000000000 -s User.Read --clear-ca
 
 ## References
 
-- <https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/wam>
-- <https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/wam>
-- <https://github.com/Azure-Samples/ms-identity-dotnet-desktop-tutorial>
+- [Spectre.Console](https://spectreconsole.net/)
+- [MSAL WAM Broker](https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/wam)
+- [MS Identity Sample Repo](https://github.com/Azure-Samples/ms-identity-dotnet-desktop-tutorial)
