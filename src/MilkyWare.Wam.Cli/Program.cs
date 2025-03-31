@@ -19,6 +19,7 @@ var registrar = new TypeRegistrar(services);
 var app = new CommandApp<GetAccessTokenCommand>(registrar);
 app.Configure(configure =>
 {
+    configure.SetApplicationName("milkyware-wam-cli");
 #if DEBUG
     configure.PropagateExceptions();
     configure.ValidateExamples();
