@@ -48,4 +48,4 @@ jobs:
           name: test-results
           path: ${{runner.temp}}/results/*.trx
           reporter: dotnet-trx
-          fail-on-error: false
+          fail-on-empty: false
