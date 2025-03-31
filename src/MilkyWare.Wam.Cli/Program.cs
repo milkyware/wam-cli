@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using MilkyWare.Wam.Cli;
 using MilkyWare.Wam.Cli.Commands;
 using MilkyWare.Wam.Cli.Interceptors;
@@ -20,6 +20,12 @@ var app = new CommandApp<GetAccessTokenCommand>(registrar);
 app.Configure(configure =>
 {
     configure.SetApplicationName("milkyware-wam-cli");
+
+    configure.AddExample("-c", Guid.Empty.ToString());
+    configure.AddExample("-c", Guid.Empty.ToString(), "-t", Guid.Empty.ToString());
+    configure.AddExample("-c", Guid.Empty.ToString(), "-s", "User.Read", "-s", "Mail.Read");
+    configure.AddExample("-c", Guid.Empty.ToString(), "--clear-cache");
+
 #if DEBUG
     configure.PropagateExceptions();
     configure.ValidateExamples();
