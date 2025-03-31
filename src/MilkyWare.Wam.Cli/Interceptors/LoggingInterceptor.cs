@@ -1,9 +1,9 @@
-﻿using ConsoleWamBroker.Commands;
+﻿using MilkyWare.Wam.Cli.Commands;
 using Serilog.Core;
 using Serilog.Events;
 using Spectre.Console.Cli;
 
-namespace ConsoleWamBroker.Interceptors
+namespace MilkyWare.Wam.Cli.Interceptors
 {
     public class LoggingInterceptor : ICommandInterceptor
     {

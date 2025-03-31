@@ -1,7 +1,7 @@
-﻿using ConsoleWamBroker;
-using ConsoleWamBroker.Commands;
-using ConsoleWamBroker.Interceptors;
 using Microsoft.Extensions.DependencyInjection;
+using MilkyWare.Wam.Cli;
+using MilkyWare.Wam.Cli.Commands;
+using MilkyWare.Wam.Cli.Interceptors;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using Spectre.Console.Cli;

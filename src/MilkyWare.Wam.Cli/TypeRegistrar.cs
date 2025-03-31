@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console.Cli;
 
-namespace ConsoleWamBroker
+namespace MilkyWare.Wam.Cli
 {
     public sealed class TypeRegistrar : ITypeRegistrar
     {

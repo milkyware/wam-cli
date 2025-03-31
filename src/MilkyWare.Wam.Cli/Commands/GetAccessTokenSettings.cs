@@ -1,7 +1,7 @@
 ﻿using Spectre.Console;
 using Spectre.Console.Cli;
 
-namespace ConsoleWamBroker.Commands
+namespace MilkyWare.Wam.Cli.Commands
 {
     public class GetAccessTokenSettings : LoggingSettings
     {

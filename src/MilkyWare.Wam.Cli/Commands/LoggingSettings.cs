@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using Spectre.Console.Cli;
 
-namespace ConsoleWamBroker.Commands
+namespace MilkyWare.Wam.Cli.Commands
 {
     public class LoggingSettings : CommandSettings
     {
