@@ -1,0 +1,118 @@
+name: Release
+
+on: 
+  release: 
+    types: [published]
+  workflow_dispatch:
+
+env:
+  ARTIFACT_NAME: package
+  DOTNET_VERSION: 8.0.x
+  PROJET_NAME: MilkyWare.Wam.Cli
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Print Environment Variables
+        shell: pwsh
+        run: |
+          Get-ChildItem Env: | ForEach-Object {Write-Host "$($_.Name)=$($_.Value)"}
+
+      - name: Shorten Source Version
+        id: shorten-source-version
+        shell: pwsh
+        run: |
+          $hash = "${{ github.sha }}".SubString(0, 8)
+          "hash=$hash" >> $env:GITHUB_OUTPUT
+
+      - name: Extract Version
+        id: extract-version
+        shell: pwsh
+        run: ./scripts/ExtractVersion.ps1
+
+      - name: Setup Dotnet
+        id: setup-dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+  
+      - name: Dotnet Version
+        id: dotnet-version
+        run: dotnet --version
+
+      - name: Test
+        run: dotnet test --logger trx --collect "Code coverage" --results-directory ${{ runner.temp }}/results
+
+      - name: Publish Results
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: test-results
+          path: ${{runner.temp}}/results/*.trx
+          reporter: dotnet-trx
+          fail-on-empty: false
+
+      - name: Pack
+        shell: pwsh
+        run: |
+          dotnet pack ./src/${{env.PROJET_NAME}} -o ${{ runner.temp }}/nupkg -p:Version="${{ steps.extract-version.outputs.version }}" --p:SourceRevisionId="${{ steps.shorten-source-version.outputs.hash }}" --p:SourceBranchName="${{ github.ref_name }}"
+
+      - name: Upload Artifact
+        id: upload-artifact
+        uses: actions/upload-artifact@v4
+        with: 
+          name: ${{ env.ARTIFACT_NAME}}
+          path: ${{ runner.temp }}/nupkg/*.nupkg
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Environment Variables
+        shell: pwsh
+        run: |
+          Get-ChildItem Env: | ForEach-Object {Write-Host "$($_.Name)=$($_.Value)"}
+
+      - name: Download Artifact
+        id: download-artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME}}
+
+      - name: Setup Dotnet
+        id: setup-dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Add Nuget Source
+        shell: pwsh
+        run: |
+          dotnet nuget add source ${{ secrets.AZ_DEVOPS_FEED }} --name MilkyWare --username ${{ secrets.AZ_DEVOPS_USERNAME }} --password ${{ secrets.AZ_DEVOPS_PASSWORD }} --store-password-in-clear-text
+
+      - name: Nuget Push
+        shell: pwsh
+        run: |
+          if ($env:RUNNER_DEBUG)
+          {
+              $VerbosePreference = "Continue"
+          }
+          $path = "${{ steps.download-artifact.outputs.download-path }}/*.nupkg"
+          Write-Verbose "path=$path"
+          $output = dotnet nuget push $path --source MilkyWare --skip-duplicate --api-key dummy
+          if ($LASTEXITCODE) {
+            $message = $output -match "error:.*"
+            throw $message
+          }
+          $output
