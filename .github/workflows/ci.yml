@@ -1,0 +1,50 @@
+name: CI
+
+on: 
+  push:
+  workflow_dispatch: 
+
+env:
+  DOTNET_VERSION: 8.0.x
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Print Environment Variables
+        shell: pwsh
+        run: |
+          Get-ChildItem Env: | ForEach-Object {Write-Host "$($_.Name)=$($_.Value)"}
+
+      - name: Setup Dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{env.DOTNET_VERSION}}
+
+      - name: Dotnet Version
+        run: dotnet --version
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build
+
+      - name: Test
+        run: dotnet test --logger trx --collect "Code coverage" --results-directory ${{runner.temp}}/results
+
+      - name: Publish Results
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: test-results
+          path: ${{runner.temp}}/results/*.trx
+          reporter: dotnet-trx
