@@ -67,7 +67,16 @@ namespace MilkyWare.Wam.Cli.Commands
 
             var account = accounts.FirstOrDefault() ?? PublicClientApplication.OperatingSystemAccount;
 
-            var authResult = await AcquireTokenAsync(app, account, settings.Scopes);
+            AuthenticationResult authResult;
+            try
+            {
+                authResult = await AcquireTokenAsync(app, account, settings.Scopes);
+            }
+            catch (MsalException ex) when (ex.ErrorCode == MsalError.AuthenticationCanceledError)
+            {
+                _logger.LogWarning("Authentication was cancelled");
+                return 0;
+            }
 
             var json = JsonSerializer.Serialize(new { authResult.AccessToken }, s_jsonSerializerOptions);
 
