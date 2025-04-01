@@ -15,8 +15,8 @@ namespace MilkyWare.Wam.Cli.Commands
         public string? ClientId { get; set; }
 
         [CommandOption("-s|--scope <VALUES>")]
-        [Description("Optional. The scopes required for the token. Defaults to User.Read")]
-        public string[] Scopes { get; set; } = ["User.Read"];
+        [Description("Optional. The scopes required for the token. Defaults to .default scope")]
+        public string[] Scopes { get; set; } = ["https://graph.microsoft.com/.default"];
 
         [CommandOption("-t|--tenant-id")]
         [Description("Optional. The tenant ID of the single tenancy App Reg")]
