@@ -2,6 +2,7 @@
 
 - [WAM CLI](#wam-cli)
   - [Overview](#overview)
+  - [Key Features](#key-features)
   - [Installation](#installation)
   - [Upgrading](#upgrading)
   - [Usage](#usage)
@@ -11,7 +12,13 @@
 
 ## Overview
 
-WAM CLI is a command-line tool designed to generate access tokens using the Microsoft Authentication Library (MSAL) with the Web Account Manager (WAM) broker. It simplifies scripts by offloading and centralising authentication to this configurable tool, avoiding the need for each script to handle silent and interactive token generation.
+WAM CLI is a command-line tool for generating access tokens using the Microsoft Authentication Library (MSAL) and the Web Account Manager (WAM) broker. It simplifies authentication for scripts and applications by centralizing token generation, supporting both silent and interactive flows.
+
+## Key Features
+
+- Support for single and multi tenancy app registrations
+- Simplifies authentication by handling token caching and interactive logins
+- Outputs tokens in JSON format for easy integration with scripts
 
 ## Installation
 
@@ -57,6 +64,30 @@ OPTIONS:
     -s, --scope <VALUES>    Optional. The scopes required for the token. Defaults to User.Read
     -t, --tenant-id         Optional. The tenant ID of the single tenancy App Reg             
 ```
+
+The Cli supports **both single-tenancy and multi-tenancy (inc. personal accounts)** configured app registrations to generate tokens.
+
+``` bash
+milkyware-wam-cli --client-id 00000000-0000-0000-0000-000000000000
+```
+
+Running the above command (with a multi-tenancy enabled) app reg client id will firstly attempt to **silently acquire** a token from the cache. If a token is not found, the interactive WAM prompt will then be displayed.
+
+![image1](images/image1.png)
+
+The WAM broker displays **windows connected** accounts to login with.
+
+![image2](images/image2.png)
+
+If the account hasn't authorised with the app reg before, or the requested permissions have changed, the user will also be asked to accept the permissions.
+
+``` json
+{
+  "accesstoken": "access-token-value"
+}
+```
+
+Lastly, the Cli returns a JSON object containing the token. This can then easily be de-serialized, such as `ConvertFrom-Json` in PowerShell, and attached to Graph API requests.
 
 ## Getting Started
 
