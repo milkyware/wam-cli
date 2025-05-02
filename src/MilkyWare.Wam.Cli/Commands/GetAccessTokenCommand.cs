@@ -45,7 +45,7 @@ namespace MilkyWare.Wam.Cli.Commands
             var app = builder.Build();
 
             _logger.LogDebug("Configuring cache");
-            var filePath = Path.Combine(MsalCacheHelper.UserRootDirectory, "msal.contoso.cache");
+            var filePath = Path.Combine(MsalCacheHelper.UserRootDirectory, ".wam-cli", "msal.contoso.cache");
             var storageProperties = new StorageCreationPropertiesBuilder(Path.GetFileName(filePath),
                 Path.GetDirectoryName(filePath))
                 .Build();
