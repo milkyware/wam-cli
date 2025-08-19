@@ -55,7 +55,7 @@ jobs:
         run: dotnet test --logger trx --collect "Code coverage" --results-directory ${{ runner.temp }}/results
 
       - name: Publish Results
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2
         if: success() || failure()
         with:
           name: test-results
