@@ -43,7 +43,7 @@ jobs:
 
       - name: Setup Dotnet
         id: setup-dotnet
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
   
@@ -92,7 +92,7 @@ jobs:
 
       - name: Setup Dotnet
         id: setup-dotnet
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
