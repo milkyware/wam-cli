@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Print Environment Variables
         shell: pwsh
@@ -25,7 +25,7 @@ jobs:
           Get-ChildItem Env: | ForEach-Object {Write-Host "$($_.Name)=$($_.Value)"}
 
       - name: Setup Dotnet
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{env.DOTNET_VERSION}}
 
@@ -42,7 +42,7 @@ jobs:
         run: dotnet test --logger trx --collect "Code coverage" --results-directory ${{runner.temp}}/results
 
       - name: Publish Results
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2
         if: success() || failure()
         with:
           name: test-results
