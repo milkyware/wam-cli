@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
@@ -26,7 +26,7 @@ namespace MilkyWare.Wam.Cli.Commands
             GetRootOwner = 3
         }
 
-        public override async Task<int> ExecuteAsync(CommandContext context, GetAccessTokenSettings settings)
+        public override async Task<int> ExecuteAsync(CommandContext context, GetAccessTokenSettings settings, CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(settings.ClientId);
 
