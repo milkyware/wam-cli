@@ -26,7 +26,7 @@ namespace MilkyWare.Wam.Cli.Commands
             GetRootOwner = 3
         }
 
-        public override async Task<int> ExecuteAsync(CommandContext context, GetAccessTokenSettings settings, CancellationToken cancellationToken)
+        protected override async Task<int> ExecuteAsync(CommandContext context, GetAccessTokenSettings settings, CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(settings.ClientId);
 
