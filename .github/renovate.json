@@ -3,7 +3,8 @@
   "extends": [
     "config:recommended",
     ":automergeMinor",
-    "security:openssf-scorecard"
+    "security:openssf-scorecard",
+    "github>milkyware/actions"
   ],
   "labels": [
     "dependencies",
@@ -12,16 +13,10 @@
   ],
   "automergeStrategy": "squash",
   "minimumReleaseAge": "14 days",
+  "semanticCommits": "enabled",
   "separateMajorMinor": true,
   "vulnerabilityAlerts": {
-    "addLabels": ["security"]
+    "labels": ["security"]
   },
-  "packageRules": [
-    {
-      "groupName": "FluentAssertions Ignore",
-      "matchManagers": ["nuget"],
-      "matchPackageNames": ["FluentAssertions"],
-      "allowedVersions": "<8.0.0"
-    }
-  ]
+  "packageRules": []
 }
