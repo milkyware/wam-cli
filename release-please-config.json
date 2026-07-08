@@ -1,0 +1,31 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "release-type": "simple",
+  "always-update": true,
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": true,
+  "changelog-path": "CHANGELOG.md",
+  "include-commit-authors": true,
+  "include-v-in-tag": true,
+  "exclude-paths": [
+    ".git",
+    ".idea",
+    ".vscode"
+  ],
+  "changelog-sections": [
+    { "type": "feat", "section": "Features" },
+    { "type": "fix", "section": "Bug fixes" },
+    { "type": "perf", "section": "Performance improvements" },
+    { "type": "docs", "section": "Documentation" },
+    { "type": "refactor", "section": "Refactors" },
+    { "type": "build", "section": "Build system" },
+    { "type": "chore", "section": "Chores" }
+  ],
+  "packages": {
+    ".": {
+      "extra-files": [
+        "src/MilkyWare.Wam.Cli/MilkyWare.Wam.Cli.csproj"
+      ]
+    }
+  }
+}

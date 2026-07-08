@@ -1,19 +1,25 @@
 name: Release
 
 on: 
-  release: 
-    types: [published]
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      tag_name:
+        description: The tag name to release the CLI to, e.g. v1.0.0
+        required: true
+        type: string
+      version:
+        description: The full semantic version of the CLI to release, e.g. 1.0.0
+        required: true
+        type: string
 
 env:
   ARTIFACT_NAME: package
   DOTNET_VERSION: 10.0.x
-  PROJET_NAME: MilkyWare.Wam.Cli
 
 permissions:
-  contents: read
   actions: read
   checks: write
+  contents: write
 
 jobs:
   build:
@@ -25,21 +31,11 @@ jobs:
           fetch-depth: 0
 
       - name: Print Environment Variables
-        shell: pwsh
-        run: |
-          Get-ChildItem Env: | ForEach-Object {Write-Host "$($_.Name)=$($_.Value)"}
+        uses: milkyware/actions/print-env-vars@print-env-vars-v0.0.0
 
-      - name: Shorten Source Version
-        id: shorten-source-version
-        shell: pwsh
-        run: |
-          $hash = "${{ github.sha }}".SubString(0, 8)
-          "hash=$hash" >> $env:GITHUB_OUTPUT
-
-      - name: Extract Version
-        id: extract-version
-        shell: pwsh
-        run: ./scripts/ExtractVersion.ps1
+      - name: Shorten Git Hash
+        id: shorten-git-hash
+        uses: milkyware/actions/short-sha@short-sha-v0.0.1
 
       - name: Setup Dotnet
         id: setup-dotnet
@@ -61,12 +57,14 @@ jobs:
           name: test-results
           path: ${{runner.temp}}/results/*.trx
           reporter: dotnet-trx
-          fail-on-empty: false
 
       - name: Pack
         shell: pwsh
         run: |
-          dotnet pack ./src/${{env.PROJET_NAME}} -o ${{ runner.temp }}/nupkg -p:Version="${{ steps.extract-version.outputs.version }}" --p:SourceRevisionId="${{ steps.shorten-source-version.outputs.hash }}" --p:SourceBranchName="${{ github.ref_name }}"
+          dotnet pack ./src/MilkyWare.Wam.Cli -o ${{ runner.temp }}/nupkg `
+            -p:Version="${{ inputs.version }}" `
+            -p:SourceRevisionId="${{ steps.shorten-git-hash.outputs.hash }}" `
+            -p:SourceBranchName="${{ github.ref_name }}"
 
       - name: Upload Artifact
         id: upload-artifact
@@ -75,14 +73,35 @@ jobs:
           name: ${{ env.ARTIFACT_NAME}}
           path: ${{ runner.temp }}/nupkg/*.nupkg
 
-  publish:
+  publish-github:
     needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Print Environment Variables
+        uses: milkyware/actions/print-env-vars@print-env-vars-v0.0.0
+
+      - name: Download Artifact
+        id: download-artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ env.ARTIFACT_NAME}}
+
+      - name: Upload Asset
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          Get-ChildItem Env: | ForEach-Object {Write-Host "$($_.Name)=$($_.Value)"}
+          gh release upload ${{ inputs.tag_name }} `
+            ${{ steps.download-artifact.outputs.download-path }}/*.nupkg `
+            --repo ${{ github.repository }}
+
+
+  publish-nuget:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Environment Variables
+        uses: milkyware/actions/print-env-vars@print-env-vars-v0.0.0
 
       - name: Download Artifact
         id: download-artifact
@@ -99,7 +118,10 @@ jobs:
       - name: Add Nuget Source
         shell: pwsh
         run: |
-          dotnet nuget add source ${{ secrets.AZ_DEVOPS_FEED }} --name MilkyWare --username ${{ secrets.AZ_DEVOPS_USERNAME }} --password ${{ secrets.AZ_DEVOPS_PASSWORD }} --store-password-in-clear-text
+          dotnet nuget add source ${{ secrets.AZ_DEVOPS_FEED }} `
+            --name MilkyWare --username ${{ secrets.AZ_DEVOPS_USERNAME }} `
+            --password ${{ secrets.AZ_DEVOPS_PASSWORD }} `
+            --store-password-in-clear-text
 
       - name: Nuget Push
         shell: pwsh

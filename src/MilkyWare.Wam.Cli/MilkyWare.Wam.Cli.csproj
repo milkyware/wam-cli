@@ -17,7 +17,9 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/milkyware/wam-cli</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageVersion>$(Version)</PackageVersion>
+    <!-- x-release-please-start-version -->
+    <PackageVersion>0.0.4</PackageVersion>
+    <!-- x-release-please-end -->
     <RepositoryUrl>https://github.com/milkyware/wam-cli</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
