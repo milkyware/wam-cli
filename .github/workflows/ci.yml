@@ -1,51 +1,21 @@
 name: CI
 
-on: 
-  push:
-  workflow_dispatch: 
-
-env:
-  DOTNET_VERSION: 10.0.x
-
-permissions:
-  contents: read
-  actions: read
-  checks: write
+on:
+  pull_request:
 
 jobs:
-  build:
+  ci:
+    name: CI
     runs-on: ubuntu-latest
+    permissions: 
+      checks: write
+      contents: read
+      pull-requests: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v6
+        name: Checkout
 
-      - name: Print Environment Variables
-        shell: pwsh
-        run: |
-          Get-ChildItem Env: | ForEach-Object {Write-Host "$($_.Name)=$($_.Value)"}
-
-      - name: Setup Dotnet
-        uses: actions/setup-dotnet@v5
+      - uses: milkyware/actions/build-dotnet@build-dotnet-v0.0.7
         with:
-          dotnet-version: ${{env.DOTNET_VERSION}}
-
-      - name: Dotnet Version
-        run: dotnet --version
-
-      - name: Restore
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build
-
-      - name: Test
-        run: dotnet test --logger trx --collect "Code coverage" --results-directory ${{runner.temp}}/results
-
-      - name: Publish Results
-        uses: dorny/test-reporter@v3
-        if: success() || failure()
-        with:
-          name: test-results
-          path: ${{runner.temp}}/results/*.trx
-          reporter: dotnet-trx
-          fail-on-empty: false
+          skip-tests: true
+          cache: true
