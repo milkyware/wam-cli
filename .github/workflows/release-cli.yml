@@ -31,11 +31,11 @@ jobs:
           fetch-depth: 0
 
       - name: Print Environment Variables
-        uses: milkyware/actions/print-env-vars@print-env-vars-v0.0.0
+        uses: milkyware/actions/print-env-vars@print-env-vars-v0.0.2
 
       - name: Shorten Git Hash
         id: shorten-git-hash
-        uses: milkyware/actions/short-sha@short-sha-v0.0.1
+        uses: milkyware/actions/short-sha@short-sha-v0.0.2
 
       - name: Setup Dotnet
         id: setup-dotnet
@@ -78,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print Environment Variables
-        uses: milkyware/actions/print-env-vars@print-env-vars-v0.0.0
+        uses: milkyware/actions/print-env-vars@print-env-vars-v0.0.2
 
       - name: Download Artifact
         id: download-artifact
@@ -101,7 +101,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Print Environment Variables
-        uses: milkyware/actions/print-env-vars@print-env-vars-v0.0.0
+        uses: milkyware/actions/print-env-vars@print-env-vars-v0.0.2
 
       - name: Download Artifact
         id: download-artifact
