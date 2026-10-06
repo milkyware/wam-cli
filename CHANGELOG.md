@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.0.7](https://github.com/milkyware/wam-cli/compare/v0.0.6...v0.0.7) (2026-10-06)
+
+
+### 🧹 Maintenance
+
+* **deps:** update actions action to v0.0.2 ([#55](https://github.com/milkyware/wam-cli/issues/55)) ([eaaa293](https://github.com/milkyware/wam-cli/commit/eaaa29385391b7c9d5dc20a64602d8f25ecad75a))
+* updated `build-dotnet` version ([673706e](https://github.com/milkyware/wam-cli/commit/673706efe839b10e3c22e33fd3bbd2e72b77f8d8))
+* updated CI trigger filter ([35fe03e](https://github.com/milkyware/wam-cli/commit/35fe03ed41f2760f70be4ce0f95c26059cfdd9b1))
+* updated release-please sections ([0ecd940](https://github.com/milkyware/wam-cli/commit/0ecd940f4b7f1072cc797343d97a600c5207fce4))
+
 ## [0.0.6](https://github.com/milkyware/wam-cli/compare/v0.0.5...v0.0.6) (2026-10-01)
 
 
