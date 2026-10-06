@@ -47,17 +47,6 @@ jobs:
         id: dotnet-version
         run: dotnet --version
 
-      - name: Test
-        run: dotnet test --logger trx --collect "Code coverage" --results-directory ${{ runner.temp }}/results
-
-      - name: Publish Results
-        uses: dorny/test-reporter@v3
-        if: success() || failure()
-        with:
-          name: test-results
-          path: ${{runner.temp}}/results/*.trx
-          reporter: dotnet-trx
-
       - name: Pack
         shell: pwsh
         run: |
