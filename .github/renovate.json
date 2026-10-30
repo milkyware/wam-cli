@@ -2,7 +2,9 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
-    ":automergeMinor",
+    ":semanticCommits",
+    ":separateMajorReleases",
+    "helpers:pinGitHubActionDigestsToSemver",
     "security:openssf-scorecard",
     "github>milkyware/actions"
   ],
@@ -13,10 +15,8 @@
   ],
   "automergeStrategy": "squash",
   "minimumReleaseAge": "14 days",
-  "semanticCommits": "enabled",
-  "separateMajorMinor": true,
   "vulnerabilityAlerts": {
-    "labels": ["security"]
+    "addLabels": ["security"]
   },
   "packageRules": []
 }
