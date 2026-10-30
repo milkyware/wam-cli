@@ -1,0 +1,7 @@
+---
+# Checkov configuration for Super-Linter.
+quiet: true
+# The Jibble CLI image runs an on-demand command rather than a long-lived
+# service, so there is no process for a HEALTHCHECK to probe.
+skip-check:
+  - CKV_DOCKER_2

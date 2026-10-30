@@ -1,0 +1,9 @@
+rules:
+  artipacked:
+    ignore:
+      - dotnet-format.yml
+  excessive-permissions:
+    ignore:
+      - release-please.yml
+  secrets-inherit:
+    disable: true
