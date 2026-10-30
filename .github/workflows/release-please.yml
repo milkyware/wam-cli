@@ -27,7 +27,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   release-cli:
-    uses: ./.github/workflows/release-cli.yml
+    uses: $/.github/workflows/release-cli.yml
     needs: release-please
     if: ${{ needs.release-please.outputs.releases_created == 'true' }}
     permissions:
