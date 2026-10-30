@@ -20,6 +20,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: milkyware/actions/build-dotnet@build-dotnet-v0.0.16
+      - uses: milkyware/actions/build-dotnet@8a8a574533fc80d8c6f5a51ecbce8a0fb13d0e1b # build-dotnet-v0.0.21
         with:
           skip-tests: true
