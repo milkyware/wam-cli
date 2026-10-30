@@ -8,11 +8,7 @@
     "security:openssf-scorecard",
     "github>milkyware/actions"
   ],
-  "labels": [
-    "dependencies",
-    "{{manager}}",
-    "{{updateType}}"
-  ],
+  "labels": ["dependencies", "{{manager}}", "{{updateType}}"],
   "automergeStrategy": "squash",
   "minimumReleaseAge": "14 days",
   "vulnerabilityAlerts": {

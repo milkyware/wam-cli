@@ -24,7 +24,7 @@ WAM CLI is a command-line tool for generating access tokens using the Microsoft 
 
 To install the tool globally, use the command below:
 
-``` bash
+```bash
 dotnet tool install --global milkyware-wam-cli
 ```
 
@@ -32,7 +32,7 @@ dotnet tool install --global milkyware-wam-cli
 
 When an update becomes available, the tool can be upgraded using `dotnet tool update`:
 
-``` bash
+```bash
 dotnet tool update --global milkyware-wam-cli
 ```
 
@@ -40,13 +40,13 @@ dotnet tool update --global milkyware-wam-cli
 
 The cli has the `--help` option available to display examples as well as documentation for the options available:
 
-``` bash
+```bash
 milkyware-wam-cli --help
 ```
 
 Running the cli with `--help` displays the below:
 
-``` bash
+```bash
 USAGE:
     milkyware-wam-cli [OPTIONS]
 
@@ -57,17 +57,17 @@ EXAMPLES:
     milkyware-wam-cli -c 00000000-0000-0000-0000-000000000000 --clear-cache
 
 OPTIONS:
-    -h, --help              Prints help information                                           
-        --debug             Increase logging verbosity to show all debug logs                 
-        --clear-cache       Clear the token cache before acquiring a new token                
-    -c, --client-id         Required. The client ID of the app reg                            
+    -h, --help              Prints help information
+        --debug             Increase logging verbosity to show all debug logs
+        --clear-cache       Clear the token cache before acquiring a new token
+    -c, --client-id         Required. The client ID of the app reg
     -s, --scope <VALUES>    Optional. The scopes required for the token. Defaults to User.Read
-    -t, --tenant-id         Optional. The tenant ID of the single tenancy App Reg             
+    -t, --tenant-id         Optional. The tenant ID of the single tenancy App Reg
 ```
 
 The Cli supports **both single-tenancy and multi-tenancy (inc. personal accounts)** configured app registrations to generate tokens.
 
-``` bash
+```bash
 milkyware-wam-cli --client-id 00000000-0000-0000-0000-000000000000
 ```
 
@@ -81,7 +81,7 @@ The WAM broker displays **windows connected** accounts to login with.
 
 If the account hasn't authorised with the app reg before, or the requested permissions have changed, the user will also be asked to accept the permissions.
 
-``` json
+```json
 {
   "accesstoken": "access-token-value"
 }

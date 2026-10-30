@@ -7,11 +7,7 @@
   "changelog-path": "CHANGELOG.md",
   "include-commit-authors": true,
   "include-v-in-tag": true,
-  "exclude-paths": [
-    ".git",
-    ".idea",
-    ".vscode"
-  ],
+  "exclude-paths": [".git", ".idea", ".vscode"],
   "changelog-sections": [
     { "type": "breaking", "section": "⛓️‍💥 Breaking Changes" },
     { "type": "feat", "section": "🚀 Enhancements" },
@@ -27,9 +23,7 @@
   ],
   "packages": {
     ".": {
-      "extra-files": [
-        "src/MilkyWare.Wam.Cli/MilkyWare.Wam.Cli.csproj"
-      ]
+      "extra-files": ["src/MilkyWare.Wam.Cli/MilkyWare.Wam.Cli.csproj"]
     }
   }
 }
