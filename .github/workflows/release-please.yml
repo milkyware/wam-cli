@@ -38,7 +38,10 @@ jobs:
       actions: read
       checks: write
       contents: write
-    secrets: inherit
+    secrets:
+      AZ_DEVOPS_FEED: ${{ secrets.AZ_DEVOPS_FEED }}
+      AZ_DEVOPS_USERNAME: ${{ secrets.AZ_DEVOPS_USERNAME }}
+      AZ_DEVOPS_PASSWORD: ${{ secrets.AZ_DEVOPS_PASSWORD }}
     with:
       tag_name: ${{ needs.release-please.outputs.tag_name }}
       version: ${{ needs.release-please.outputs.version }}

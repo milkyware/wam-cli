@@ -1,6 +1,6 @@
 name: Release
 
-on: 
+on:
   workflow_call:
     inputs:
       tag_name:
@@ -11,6 +11,13 @@ on:
         description: The full semantic version of the CLI to release, e.g. 1.0.0
         required: true
         type: string
+    secrets:
+      AZ_DEVOPS_FEED:
+        required: true
+      AZ_DEVOPS_USERNAME:
+        required: true
+      AZ_DEVOPS_PASSWORD:
+        required: true
 
 env:
   ARTIFACT_NAME: package
@@ -29,6 +36,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Print Environment Variables
         uses: milkyware/actions/print-env-vars@80896ed5b85db760fdf63b73335fa437705b3c8c # print-env-vars-v0.0.2
@@ -42,18 +50,22 @@ jobs:
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-  
+
       - name: Dotnet Version
         id: dotnet-version
         run: dotnet --version
 
       - name: Pack
         shell: pwsh
+        env:
+          VERSION: ${{ inputs.version }}
+          SOURCE_REVISION_ID: ${{ steps.shorten-git-hash.outputs.hash }}
+          SOURCE_BRANCH_NAME: ${{ github.ref_name }}
         run: |
           dotnet pack ./src/MilkyWare.Wam.Cli -o ${{ runner.temp }}/nupkg `
-            -p:Version="${{ inputs.version }}" `
-            -p:SourceRevisionId="${{ steps.shorten-git-hash.outputs.hash }}" `
-            -p:SourceBranchName="${{ github.ref_name }}"
+            -p:Version="$env:VERSION" `
+            -p:SourceRevisionId="$env:SOURCE_REVISION_ID" `
+            -p:SourceBranchName="$env:SOURCE_BRANCH_NAME"
 
       - name: Upload Artifact
         id: upload-artifact
@@ -73,15 +85,17 @@ jobs:
         id: download-artifact
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          name: ${{ env.ARTIFACT_NAME}}
+          name: ${{ env.ARTIFACT_NAME }}
 
       - name: Upload Asset
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ inputs.tag_name }}
+          DOWNLOAD_PATH: ${{ steps.download-artifact.outputs.download-path }}
         run: |
-          gh release upload ${{ inputs.tag_name }} `
-            ${{ steps.download-artifact.outputs.download-path }}/*.nupkg `
+          gh release upload "$env:TAG_NAME" `
+            "$env:DOWNLOAD_PATH"/*.nupkg `
             --repo ${{ github.repository }}
 
 
@@ -96,7 +110,7 @@ jobs:
         id: download-artifact
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          name: ${{ env.ARTIFACT_NAME}}
+          name: ${{ env.ARTIFACT_NAME }}
 
       - name: Setup Dotnet
         id: setup-dotnet
@@ -106,20 +120,26 @@ jobs:
 
       - name: Add Nuget Source
         shell: pwsh
+        env:
+          AZ_DEVOPS_FEED: ${{ secrets.AZ_DEVOPS_FEED }}
+          AZ_DEVOPS_USERNAME: ${{ secrets.AZ_DEVOPS_USERNAME }}
+          AZ_DEVOPS_PASSWORD: ${{ secrets.AZ_DEVOPS_PASSWORD }}
         run: |
-          dotnet nuget add source ${{ secrets.AZ_DEVOPS_FEED }} `
-            --name MilkyWare --username ${{ secrets.AZ_DEVOPS_USERNAME }} `
-            --password ${{ secrets.AZ_DEVOPS_PASSWORD }} `
+          dotnet nuget add source $env:AZ_DEVOPS_FEED `
+            --name MilkyWare --username $env:AZ_DEVOPS_USERNAME `
+            --password $env:AZ_DEVOPS_PASSWORD `
             --store-password-in-clear-text
 
       - name: Nuget Push
         shell: pwsh
+        env:
+          DOWNLOAD_PATH: ${{ steps.download-artifact.outputs.download-path }}
         run: |
           if ($env:RUNNER_DEBUG)
           {
               $VerbosePreference = "Continue"
           }
-          $path = "${{ steps.download-artifact.outputs.download-path }}/*.nupkg"
+          $path = "$env:DOWNLOAD_PATH/*.nupkg"
           Write-Verbose "path=$path"
           $output = dotnet nuget push $path --source MilkyWare --skip-duplicate --api-key dummy
           if ($LASTEXITCODE) {
