@@ -1,9 +1,6 @@
+---
 rules:
-  artipacked:
+  use-trusted-publishing:
     ignore:
-      - dotnet-format.yml
-  excessive-permissions:
-    ignore:
-      - release-please.yml
-  secrets-inherit:
-    disable: true
+      # This publishes to an Azure DevOps feed, not nuget.org.
+      - release-cli.yml
