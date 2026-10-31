@@ -1,3 +1,0 @@
-# The Jibble CLI image runs an on-demand command rather than a long-lived
-# service, so there is no process for a HEALTHCHECK to probe.
-DS-0026
