@@ -6,14 +6,13 @@ on:
       - "src/**"
       - "tests/**"
 
+permissions:
+  contents: read
+
 jobs:
   ci:
     name: CI
     runs-on: ubuntu-latest
-    permissions: 
-      checks: write
-      contents: read
-      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         name: Checkout
