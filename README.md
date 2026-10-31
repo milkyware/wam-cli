@@ -71,7 +71,7 @@ The Cli supports **both single-tenancy and multi-tenancy (inc. personal accounts
 milkyware-wam-cli --client-id 00000000-0000-0000-0000-000000000000
 ```
 
-Running the above command (with a multi-tenancy enabled) app reg client id will firstly attempt to **silently acquire** a token from the cache. If a token is not found, the interactive WAM prompt will then be displayed.
+Running the above command (with a multi-tenancy enabled) app reg client ID will firstly attempt to **silently acquire** a token from the cache. If a token is not found, the interactive WAM prompt will then be displayed.
 
 ![image1](images/image1.png)
 
@@ -93,7 +93,7 @@ Lastly, the Cli returns a JSON object containing the token. This can then easily
 
 ### Sample launchSettings.json
 
-The **launchSettings.json** file is ignored from the repo to avoid IDs being committed. Below is a sample of launch configurations to allow debugging the app. Any of the available arguments and options can be configured in the `commandLineArgs` property:
+The **launchSettings.json** file is ignored from the repository to avoid IDs being committed. Below is a sample of launch configurations to allow debugging the app. Any of the available arguments and options can be configured in the `commandLineArgs` property:
 
 ```json
 {
@@ -110,4 +110,4 @@ The **launchSettings.json** file is ignored from the repo to avoid IDs being com
 
 - [Spectre.Console](https://spectreconsole.net/)
 - [MSAL WAM Broker](https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/wam)
-- [MS Identity Sample Repo](https://github.com/Azure-Samples/ms-identity-dotnet-desktop-tutorial)
+- [MS Identity Sample Repository](https://github.com/Azure-Samples/ms-identity-dotnet-desktop-tutorial)
