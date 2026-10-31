@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console.Cli;
 
 namespace MilkyWare.Wam.Cli

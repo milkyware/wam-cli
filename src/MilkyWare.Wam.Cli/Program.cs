@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using MilkyWare.Wam.Cli;
 using MilkyWare.Wam.Cli.Commands;
 using MilkyWare.Wam.Cli.Interceptors;

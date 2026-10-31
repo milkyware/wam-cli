@@ -1,4 +1,4 @@
-﻿using MilkyWare.Wam.Cli.Commands;
+using MilkyWare.Wam.Cli.Commands;
 using Serilog.Core;
 using Serilog.Events;
 using Spectre.Console.Cli;

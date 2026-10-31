@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Spectre.Console.Cli;
 
 namespace MilkyWare.Wam.Cli.Commands
