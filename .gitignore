@@ -363,3 +363,6 @@ FodyWeavers.xsd
 
 # .NET launch settings
 **/[Pp]roperties/launchSettings.json
+
+# Cortexkit
+.cortexkit/
