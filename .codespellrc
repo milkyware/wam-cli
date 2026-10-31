@@ -1,4 +1,4 @@
 [codespell]
 check-hidden =
 skip = *.log,.git,.gitignore,*/.gitignore,*.dic,*.slnx
-ignore-words-list = planText,jibble,milkyware,spectre
+ignore-words-list = planText,milkyware,spectre
