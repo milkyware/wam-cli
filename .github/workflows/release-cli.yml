@@ -95,8 +95,9 @@ jobs:
           DOWNLOAD_PATH: ${{ steps.download-artifact.outputs.download-path }}
         run: |
           gh release upload "$env:TAG_NAME" `
-            "$env:DOWNLOAD_PATH"/*.nupkg `
-            --repo ${{ github.repository }}
+            "$env:DOWNLOAD_PATH/*.nupkg" `
+            --repo ${{ github.repository }} `
+            --clobber
 
 
   publish-nuget:
