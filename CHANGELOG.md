@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.1.0](https://github.com/milkyware/wam-cli/compare/v0.0.10...v0.1.0) (2026-11-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* publish to public `Nuget.org` ([#70](https://github.com/milkyware/wam-cli/issues/70))
+
+### 🏗️ Build & Automation
+
+* publish to public `Nuget.org` ([#70](https://github.com/milkyware/wam-cli/issues/70)) ([39e3ee3](https://github.com/milkyware/wam-cli/commit/39e3ee32ca149b130390c2d45ade67e8faaab611))
+
 ## [0.0.10](https://github.com/milkyware/wam-cli/compare/v0.0.9...v0.0.10) (2026-11-01)
 
 
