@@ -12,11 +12,7 @@ on:
         required: true
         type: string
     secrets:
-      AZ_DEVOPS_FEED:
-        required: true
-      AZ_DEVOPS_USERNAME:
-        required: true
-      AZ_DEVOPS_PASSWORD:
+      NUGET_USERNAME:
         required: true
 
 env:
@@ -24,9 +20,7 @@ env:
   DOTNET_VERSION: 10.0.x
 
 permissions:
-  actions: read
-  checks: write
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -38,22 +32,17 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Print Environment Variables
-        uses: milkyware/actions/print-env-vars@80896ed5b85db760fdf63b73335fa437705b3c8c # print-env-vars-v0.0.2
-
       - name: Shorten Git Hash
         id: shorten-git-hash
-        uses: milkyware/actions/short-sha@f936f72f37f4d2e8081e9de6b380a7140a2d9abb # short-sha-v0.0.2
+        shell: pwsh
+        run: |
+          $sha = git rev-parse --short HEAD
+          "hash=$sha" >> $env:GITHUB_OUTPUT
 
-      - name: Setup Dotnet
-        id: setup-dotnet
-        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
+      - name: Build Dotnet
+        uses: $/.github/actions/build-dotnet
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Dotnet Version
-        id: dotnet-version
-        run: dotnet --version
 
       - name: Pack
         shell: pwsh
@@ -65,22 +54,22 @@ jobs:
           dotnet pack ./src/MilkyWare.Wam.Cli -o ${{ runner.temp }}/nupkg `
             -p:Version="$env:VERSION" `
             -p:SourceRevisionId="$env:SOURCE_REVISION_ID" `
-            -p:SourceBranchName="$env:SOURCE_BRANCH_NAME"
+            -p:SourceBranchName="$env:SOURCE_BRANCH_NAME" `
+            --no-restore
 
       - name: Upload Artifact
         id: upload-artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with: 
-          name: ${{ env.ARTIFACT_NAME}}
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
           path: ${{ runner.temp }}/nupkg/*.nupkg
 
   publish-github:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Print Environment Variables
-        uses: milkyware/actions/print-env-vars@80896ed5b85db760fdf63b73335fa437705b3c8c # print-env-vars-v0.0.2
-
       - name: Download Artifact
         id: download-artifact
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
@@ -99,14 +88,13 @@ jobs:
             --repo ${{ github.repository }} `
             --clobber
 
-
   publish-nuget:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - name: Print Environment Variables
-        uses: milkyware/actions/print-env-vars@80896ed5b85db760fdf63b73335fa437705b3c8c # print-env-vars-v0.0.2
-
       - name: Download Artifact
         id: download-artifact
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
@@ -119,22 +107,17 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Add Nuget Source
-        shell: pwsh
-        env:
-          AZ_DEVOPS_FEED: ${{ secrets.AZ_DEVOPS_FEED }}
-          AZ_DEVOPS_USERNAME: ${{ secrets.AZ_DEVOPS_USERNAME }}
-          AZ_DEVOPS_PASSWORD: ${{ secrets.AZ_DEVOPS_PASSWORD }}
-        run: |
-          dotnet nuget add source $env:AZ_DEVOPS_FEED `
-            --name MilkyWare --username $env:AZ_DEVOPS_USERNAME `
-            --password $env:AZ_DEVOPS_PASSWORD `
-            --store-password-in-clear-text
+      - name: Nuget Login
+        id: nuget-login
+        uses: nuget/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ${{ secrets.NUGET_USERNAME }}
 
       - name: Nuget Push
         shell: pwsh
         env:
           DOWNLOAD_PATH: ${{ steps.download-artifact.outputs.download-path }}
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
         run: |
           if ($env:RUNNER_DEBUG)
           {
@@ -142,7 +125,7 @@ jobs:
           }
           $path = "$env:DOWNLOAD_PATH/*.nupkg"
           Write-Verbose "path=$path"
-          $output = dotnet nuget push $path --source MilkyWare --skip-duplicate --api-key dummy
+          $output = dotnet nuget push $path --skip-duplicate --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json
           if ($LASTEXITCODE) {
             $message = $output -match "error:.*"
             throw $message
