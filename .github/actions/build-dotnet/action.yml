@@ -33,9 +33,11 @@ runs:
 
     - name: Build
       shell: pwsh
+      env:
+        BUILD_CONFIGURATION: ${{ inputs.build-configuration }}
       run: |
         dotnet build `
-          -c ${{ inputs.build-configuration }} `
+          -c $env:BUILD_CONFIGURATION `
           --nologo `
           --verbosity minimal `
           --no-restore
