@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.10](https://github.com/milkyware/wam-cli/compare/v0.0.9...v0.0.10) (2026-11-01)
+
+
+### 🏗️ Build & Automation
+
+* fix upload of `nupkg` to release ([1d6bfc1](https://github.com/milkyware/wam-cli/commit/1d6bfc171e5ba694579ce174c84f33e4c7aef27d))
+
 ## [0.0.9](https://github.com/milkyware/wam-cli/compare/v0.0.8...v0.0.9) (2026-11-01)
 
 
