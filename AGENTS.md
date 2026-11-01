@@ -16,7 +16,7 @@ dotnet run --project src/MilkyWare.Wam.Cli --no-launch-profile -- -c <client-id>
 dotnet pack src/MilkyWare.Wam.Cli
 ```
 
-- No tests exist; CI (`.github/workflows/ci.yml`) calls the shared `build-dotnet` action with `skip-tests: true`. Do not add a `dotnet test` step expecting coverage.
+- No tests exist; CI (`.github/workflows/ci.yml`) calls the local composite action `.github/actions/build-dotnet` (restore and build, no test step). Do not add a `dotnet test` step expecting coverage.
 - `dotnet run` automatically uses the gitignored `src/MilkyWare.Wam.Cli/Properties/launchSettings.json` when it exists, which may contain local client IDs and `--clear-cache`. Pass `--no-launch-profile` for a clean run.
 - A live run needs a real Entra app registration; CI cannot verify token acquisition.
 
@@ -30,7 +30,9 @@ dotnet pack src/MilkyWare.Wam.Cli
 
 ## Conventions and releases
 
-- Match `.editorconfig`: private fields `_camelCase`, private statics `s_camelCase`, `var` preferred, Allman braces, block-scoped namespaces.
+- Match `.editorconfig`: private fields `_camelCase`, private static fields `s_camelCase`, `var` preferred, Allman braces, block-scoped namespaces.
 - Use Conventional Commits. release-please on `main` derives versions and `CHANGELOG.md`; custom types are defined in `release-please-config.json` (including `breaking`).
+- Releases publish to nuget.org from `.github/workflows/release-cli.yml` through trusted publishing: `nuget/login` exchanges a GitHub OIDC token for a short-lived key, and the `NUGET_USERNAME` repository secret holds the nuget.org profile name. The nuget.org policy names `release-cli.yml` (the workflow containing the login step), not `release-please.yml`.
+- The repository is public: do not reference private `milkyware/actions` or the `github>milkyware/actions` Renovate preset. Reusable workflow logic belongs in `.github/actions`.
 - Do not hand-edit `CHANGELOG.md` or `PackageVersion` in `MilkyWare.Wam.Cli.csproj`; release-please owns both (the version sits between `x-release-please-start-version` and `end` markers).
 - `Properties/launchSettings.json` is intentionally gitignored because it holds local app IDs; never commit it.

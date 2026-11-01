@@ -3,6 +3,7 @@
 - [WAM CLI](#wam-cli)
   - [Overview](#overview)
   - [Key Features](#key-features)
+  - [Requirements](#requirements)
   - [Installation](#installation)
   - [Upgrading](#upgrading)
   - [Usage](#usage)
@@ -19,6 +20,12 @@ WAM CLI is a command-line tool for generating access tokens using the Microsoft 
 - Support for single and multi tenancy app registrations
 - Simplifies authentication by handling token caching and interactive logins
 - Outputs tokens in JSON format for easy integration with scripts
+
+## Requirements
+
+- Windows 10 or later. Token acquisition uses the Windows Web Account Manager (WAM) broker and `user32.dll`, so the tool does not run on Linux or macOS.
+- The [.NET 10](https://dotnet.microsoft.com/download/dotnet/10.0) SDK or runtime. The SDK is required to install the tool; the runtime is required to run it.
+- An app registration in Microsoft Entra ID that supports the WAM broker. See the [MSAL WAM broker documentation](https://learn.microsoft.com/entra/msal/dotnet/acquiring-tokens/desktop-mobile/wam).
 
 ## Installation
 
@@ -61,7 +68,7 @@ OPTIONS:
         --debug             Increase logging verbosity to show all debug logs
         --clear-cache       Clear the token cache before acquiring a new token
     -c, --client-id         Required. The client ID of the app reg
-    -s, --scope <VALUES>    Optional. The scopes required for the token. Defaults to User.Read
+    -s, --scope <VALUES>    Optional. The scopes required for the token. Defaults to .default scope
     -t, --tenant-id         Optional. The tenant ID of the single tenancy App Reg
 ```
 
@@ -83,7 +90,7 @@ If the account hasn't authorised with the app reg before, or the requested permi
 
 ```json
 {
-  "accesstoken": "access-token-value"
+  "accessToken": "access-token-value"
 }
 ```
 
