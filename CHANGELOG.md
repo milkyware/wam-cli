@@ -1,5 +1,51 @@
 # Changelog
 
+## [0.0.9](https://github.com/milkyware/wam-cli/compare/v0.0.8...v0.0.9) (2026-11-01)
+
+
+### 📖 Documentation
+
+* correct natural language ([7efcf49](https://github.com/milkyware/wam-cli/commit/7efcf492a793c990691a30eb6ce9358b2ed66602))
+
+
+### 🏗️ Build & Automation
+
+* disable `persist-credentials` in ci ([886abdb](https://github.com/milkyware/wam-cli/commit/886abdbde4cd050aba8d087109366eb700dba3c0))
+* use `$` notation for local workflow ([bddae35](https://github.com/milkyware/wam-cli/commit/bddae356c130a0dacb629e564239efeec0826ce6))
+
+
+### 🧹 Maintenance
+
+* `.editorconfig` ([9283437](https://github.com/milkyware/wam-cli/commit/9283437014364f83deffeacca4f22ef68e48c678))
+* added `AGENTS.md` ([f49d200](https://github.com/milkyware/wam-cli/commit/f49d20046968854009765a3114ce2abd70f1371b))
+* added `validate-pr-title` ([c88817e](https://github.com/milkyware/wam-cli/commit/c88817ef2c9d861c7b9058d48fb27bd192de1a6d))
+* added linting config ([a4ef121](https://github.com/milkyware/wam-cli/commit/a4ef1216251d749d6fc74d38c271885ccf79d0f7))
+* added pr template ([b22cd0e](https://github.com/milkyware/wam-cli/commit/b22cd0ebb34d189b4bcdcde25cde69a5c6ff1a44))
+* cleanup codespell config ([99c73ab](https://github.com/milkyware/wam-cli/commit/99c73ab20c4326326c9dbb963edd18587ecf018e))
+* **deps:** pin dependencies ([#60](https://github.com/milkyware/wam-cli/issues/60)) ([5744a8e](https://github.com/milkyware/wam-cli/commit/5744a8e9c0d9ea8fe04830d31875bcbcd033b108))
+* **deps:** pin dependencies ([#65](https://github.com/milkyware/wam-cli/issues/65)) ([6e9f100](https://github.com/milkyware/wam-cli/commit/6e9f10054eb67974d77b263bbe5658dbc7210392))
+* **deps:** update actions/checkout action to v7.0.1 ([#66](https://github.com/milkyware/wam-cli/issues/66)) ([11ed9c1](https://github.com/milkyware/wam-cli/commit/11ed9c196668917ec4830092271017e452fc2b40))
+* **deps:** update actions/download-artifact action to v8.0.2 ([#67](https://github.com/milkyware/wam-cli/issues/67)) ([b81d378](https://github.com/milkyware/wam-cli/commit/b81d3786a08e4118fc393e504fa4746f08b8bf71))
+* **deps:** update actions/upload-artifact action to v7.0.2 ([#68](https://github.com/milkyware/wam-cli/issues/68)) ([9280c81](https://github.com/milkyware/wam-cli/commit/9280c819a84c943162fca6c87e7eee38be88ce8a))
+* **deps:** update azure-ad-microsoft-authentication-library-for-dotnet monorepo to 4.90.1 ([#61](https://github.com/milkyware/wam-cli/issues/61)) ([9cdb2f5](https://github.com/milkyware/wam-cli/commit/9cdb2f5a813f6acf2161a77c9da0405cbbe76370))
+* **deps:** update azure-ad-microsoft-authentication-library-for-dotnet monorepo to 4.91.0 ([#64](https://github.com/milkyware/wam-cli/issues/64)) ([3ee50d3](https://github.com/milkyware/wam-cli/commit/3ee50d314ad1d5b1fdafe0baad37b8add7ed758c))
+* **deps:** update dependency spectre.console.cli to 0.57.2 ([#63](https://github.com/milkyware/wam-cli/issues/63)) ([973890b](https://github.com/milkyware/wam-cli/commit/973890bf88cd47d820d52a8210692f05affa6c16))
+* disable `persist-credentials` in release-please ([cf197dc](https://github.com/milkyware/wam-cli/commit/cf197dc29ffff61da5a14a4c86ad31acfa27acfe))
+* enable automerge for minor updates ([2a0d297](https://github.com/milkyware/wam-cli/commit/2a0d2973cfa49bea72a6723c36fa42549ca9ff44))
+* fixed file encoding ([8738c7d](https://github.com/milkyware/wam-cli/commit/8738c7d433d18cbfa7b4572a0c532c27cf05807c))
+* format workflows ([f07d36f](https://github.com/milkyware/wam-cli/commit/f07d36f8fda66fadf385d318388824534289f511))
+* harden release workflows ([dda576e](https://github.com/milkyware/wam-cli/commit/dda576e19911f0b63562d1c134f7121d3fee6bb2))
+* hardened workflow permissions ([02d41d1](https://github.com/milkyware/wam-cli/commit/02d41d1dcb44d5edb7b83d6370869baa17de3d30))
+* ignore `.cortexkit` ([601da7a](https://github.com/milkyware/wam-cli/commit/601da7a773a087fde00d63d1bedc4589955f1ba0))
+* onboard `super-linter` ([d37d057](https://github.com/milkyware/wam-cli/commit/d37d057e6a3524769f296b3b628f8f740d3e1dae))
+* prettier formatting ([594eebf](https://github.com/milkyware/wam-cli/commit/594eebfdd398d01dc8bc4cad391d71d9ebf9a141))
+* remove `main` trigger from `super-linter` ([a984c77](https://github.com/milkyware/wam-cli/commit/a984c775081712bfadc874ba8ead6c4c7fde0f9e))
+* removed irrelevant `.trivyignore` ([312edb4](https://github.com/milkyware/wam-cli/commit/312edb4798f787199597d46a023c339b5e803ebf))
+* removed irrelevant checkov config ([7741dcf](https://github.com/milkyware/wam-cli/commit/7741dcfcacea55430dca197878bd8746ab7d706d))
+* rename to `actionlint.yml` ([ecb43dc](https://github.com/milkyware/wam-cli/commit/ecb43dc027f75932232fea24f6538e736b172982))
+* updated renovate config ([e89f885](https://github.com/milkyware/wam-cli/commit/e89f88598a4096cf689d6d8f8d624fa300f943b8))
+* updated zizmor config ([3e1e51f](https://github.com/milkyware/wam-cli/commit/3e1e51f7e2434f42754ab7477c38cf177ec368fd))
+
 ## [0.0.8](https://github.com/milkyware/wam-cli/compare/v0.0.7...v0.0.8) (2026-10-06)
 
 
