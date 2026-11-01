@@ -6,8 +6,7 @@
     ":semanticCommits",
     ":separateMajorReleases",
     "helpers:pinGitHubActionDigestsToSemver",
-    "security:openssf-scorecard",
-    "github>milkyware/actions"
+    "security:openssf-scorecard"
   ],
   "labels": ["dependencies", "{{manager}}", "{{updateType}}"],
   "automergeStrategy": "squash",

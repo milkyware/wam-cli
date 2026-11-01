@@ -4,7 +4,12 @@ on:
   pull_request:
     paths:
       - "src/**"
-      - "tests/**"
+      - "*.slnx"
+  workflow_dispatch:
+
+env:
+  BUILD_CONFIGURATION: Release
+  DOTNET_VERSION: 10.0.x
 
 permissions:
   contents: read
@@ -14,11 +19,13 @@ jobs:
     name: CI
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        name: Checkout
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
-      - uses: milkyware/actions/build-dotnet@8a8a574533fc80d8c6f5a51ecbce8a0fb13d0e1b # build-dotnet-v0.0.21
+      - name: Build Dotnet
+        uses: $/.github/actions/build-dotnet
         with:
-          skip-tests: true
+          build-configuration: ${{ env.BUILD_CONFIGURATION }}
+          dotnet-version: ${{ env.DOTNET_VERSION }}

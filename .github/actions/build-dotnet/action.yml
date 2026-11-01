@@ -1,0 +1,43 @@
+name: Build Dotnet
+description: Sets up the .NET SDK, restores the solution, and builds it.
+
+inputs:
+  dotnet-version:
+    description: The .NET SDK version to install.
+    required: false
+    default: 10.0.x
+  build-configuration:
+    description: The build configuration to use.
+    required: false
+    default: Release
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Dotnet
+      uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
+      with:
+        dotnet-version: ${{ inputs.dotnet-version }}
+
+    - name: Dotnet Version
+      shell: pwsh
+      run: dotnet --version
+
+    - name: Restore
+      shell: pwsh
+      run: |
+        dotnet restore `
+          -p:WarningsAsErrors=NU1901%3BNU1902%3BNU1903%3BNU1904 `
+          --nologo `
+          --verbosity minimal
+
+    - name: Build
+      shell: pwsh
+      env:
+        BUILD_CONFIGURATION: ${{ inputs.build-configuration }}
+      run: |
+        dotnet build `
+          -c $env:BUILD_CONFIGURATION `
+          --nologo `
+          --verbosity minimal `
+          --no-restore

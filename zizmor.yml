@@ -1,6 +1,0 @@
----
-rules:
-  use-trusted-publishing:
-    ignore:
-      # This publishes to an Azure DevOps feed, not nuget.org.
-      - release-cli.yml
