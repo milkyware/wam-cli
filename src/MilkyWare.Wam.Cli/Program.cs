@@ -1,8 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Identity.Client.Utils;
+using MilkyWare.Extensions.DependencyInjection;
 using MilkyWare.Wam.Cli;
 using MilkyWare.Wam.Cli.Commands;
 using MilkyWare.Wam.Cli.Interceptors;
+using MilkyWare.Wam.Cli.Services;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using Spectre.Console.Cli;
@@ -15,7 +17,7 @@ services.AddLogging(builder =>
         .WriteTo.Console(theme: AnsiConsoleTheme.Literate)
         .CreateLogger());
 });
-services.AddTransient<ICommandInterceptor, LoggingInterceptor>();
+services.AddWamCliServices();
 var registrar = new TypeRegistrar(services);
 var app = new CommandApp<GetAccessTokenCommand>(registrar);
 app.Configure(configure =>
