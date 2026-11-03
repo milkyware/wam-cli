@@ -13,19 +13,23 @@
 
 ## Overview
 
-WAM CLI is a command-line tool for generating access tokens using the Microsoft Authentication Library (MSAL) and the Web Account Manager (WAM) broker. It simplifies authentication for scripts and applications by centralizing token generation, supporting both silent and interactive flows.
+WAM CLI is a command-line tool for generating access tokens using the Microsoft Authentication Library (MSAL) and the platform authentication broker (Windows Web Account Manager, Microsoft single sign-on for Linux, or the macOS broker). It simplifies authentication for scripts and applications by centralizing token generation, supporting both silent and interactive flows.
 
 ## Key Features
 
 - Support for single and multi tenancy app registrations
 - Simplifies authentication by handling token caching and interactive logins
 - Outputs tokens in JSON format for easy integration with scripts
+- Runs on Windows, Linux and macOS, using each platform's authentication broker
 
 ## Requirements
 
-- Windows 10 or later. Token acquisition uses the Windows Web Account Manager (WAM) broker and `user32.dll`, so the tool does not run on Linux or macOS.
+- Windows 10 or later, Linux, or macOS 10.15 or later. Token acquisition uses the platform authentication broker, which is selected automatically at runtime.
+  - **Windows** uses the Web Account Manager (WAM) broker, which is built into the OS.
+  - **Linux** requires the [Microsoft single sign-on for Linux](https://learn.microsoft.com/entra/msal/dotnet/acquiring-tokens/desktop-mobile/linux-dotnet-sdk) broker (`sudo apt install microsoft-identity-broker`) plus `libsecret` and `libx11`. The `https://login.microsoftonline.com/common/oauth2/nativeclient` redirect URI must be enabled on the app registration.
+  - **macOS** requires the Company Portal app, and the device must be enrolled. The `msauth.com.msauth.unsignedapp://auth` redirect URI must be enabled on the app registration.
 - The [.NET 10](https://dotnet.microsoft.com/download/dotnet/10.0) SDK or runtime. The SDK is required to install the tool; the runtime is required to run it.
-- An app registration in Microsoft Entra ID that supports the WAM broker. See the [MSAL WAM broker documentation](https://learn.microsoft.com/entra/msal/dotnet/acquiring-tokens/desktop-mobile/wam).
+- An app registration in Microsoft Entra ID that supports broker authentication. See the [MSAL broker documentation](https://learn.microsoft.com/entra/msal/dotnet/acquiring-tokens/desktop-mobile/wam).
 
 ## Installation
 
@@ -78,11 +82,11 @@ The Cli supports **both single-tenancy and multi-tenancy (inc. personal accounts
 milkyware-wam-cli --client-id 00000000-0000-0000-0000-000000000000
 ```
 
-Running the above command (with a multi-tenancy enabled) app reg client ID will firstly attempt to **silently acquire** a token from the cache. If a token is not found, the interactive WAM prompt will then be displayed.
+Running the above command (with a multi-tenancy enabled) app reg client ID will firstly attempt to **silently acquire** a token from the cache. If a token is not found, the interactive broker prompt will then be displayed.
 
 ![image1](images/image1.png)
 
-The WAM broker displays **windows connected** accounts to login with.
+On Windows, the WAM broker displays the **windows connected** accounts to sign in with.
 
 ![image2](images/image2.png)
 
@@ -117,4 +121,6 @@ The **launchSettings.json** file is ignored from the repository to avoid IDs bei
 
 - [Spectre.Console](https://spectreconsole.net/)
 - [MSAL WAM Broker](https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/wam)
+- [MSAL broker on Linux](https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/linux-dotnet-sdk)
+- [MSAL macOS broker](https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/macos-broker-dotnet-sdk)
 - [MS Identity Sample Repository](https://github.com/Azure-Samples/ms-identity-dotnet-desktop-tutorial)

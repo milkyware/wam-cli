@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Broker;
 using Microsoft.Identity.Client.Extensions.Msal;
+using Microsoft.Identity.Client.Utils;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
@@ -31,10 +32,30 @@ namespace MilkyWare.Wam.Cli.Commands
             ArgumentException.ThrowIfNullOrWhiteSpace(settings.ClientId);
 
             _logger.LogDebug("Building client app");
+            var brokerOperatingSystem = GetBrokerOperatingSystem();
+            _logger.LogDebug("Using {BrokerOperatingSystem} broker", brokerOperatingSystem);
             var builder = PublicClientApplicationBuilder.Create(settings.ClientId)
-                .WithDefaultRedirectUri()
-                .WithParentActivityOrWindow(GetConsoleOrTerminalWindow)
-                .WithBroker(new BrokerOptions(BrokerOptions.OperatingSystems.Windows));
+                .WithBroker(new BrokerOptions(brokerOperatingSystem));
+
+            if (brokerOperatingSystem == BrokerOptions.OperatingSystems.OSX)
+            {
+                // The macOS broker requires the unsigned executable redirect URI for console apps.
+                builder.WithRedirectUri("msauth.com.msauth.unsignedapp://auth");
+            }
+            else
+            {
+                builder.WithDefaultRedirectUri();
+            }
+
+            // macOS broker flows do not support a parent window handle, so only Windows and Linux set one.
+            if (brokerOperatingSystem == BrokerOptions.OperatingSystems.Windows)
+            {
+                builder.WithParentActivityOrWindow(GetConsoleOrTerminalWindow);
+            }
+            else if (brokerOperatingSystem == BrokerOptions.OperatingSystems.Linux)
+            {
+                builder.WithParentActivityOrWindow(GetLinuxConsoleWindow);
+            }
 
             if (!string.IsNullOrWhiteSpace(settings.TenantId))
             {
@@ -48,6 +69,13 @@ namespace MilkyWare.Wam.Cli.Commands
             var filePath = Path.Combine(MsalCacheHelper.UserRootDirectory, ".wam-cli", "msal.contoso.cache");
             var storageProperties = new StorageCreationPropertiesBuilder(Path.GetFileName(filePath),
                 Path.GetDirectoryName(filePath))
+                .WithLinuxKeyring(
+                    "com.milkyware.wam-cli",
+                    "default",
+                    "MSALCache",
+                    new KeyValuePair<string, string>("MsalClientID", "Microsoft.Developer.IdentityService"),
+                    new KeyValuePair<string, string>("MsalClientVersion", "1.0.0.0"))
+                .WithMacKeyChain("com.milkyware.wam-cli", "MSALCache")
                 .Build();
 
             var cacheHelper = await MsalCacheHelper.CreateAsync(storageProperties);
@@ -87,6 +115,14 @@ namespace MilkyWare.Wam.Cli.Commands
 
         #region Private Helpers
 
+        private static BrokerOptions.OperatingSystems GetBrokerOperatingSystem() => true switch
+        {
+            _ when OperatingSystem.IsWindows() => BrokerOptions.OperatingSystems.Windows,
+            _ when OperatingSystem.IsLinux() => BrokerOptions.OperatingSystems.Linux,
+            _ when OperatingSystem.IsMacOS() => BrokerOptions.OperatingSystems.OSX,
+            _ => throw new PlatformNotSupportedException("The broker is not supported on the current operating system."),
+        };
+
         [DllImport("user32.dll", ExactSpelling = true)]
         private static extern IntPtr GetAncestor(IntPtr hwnd, GetAncestorFlags flags);
 
@@ -101,6 +137,30 @@ namespace MilkyWare.Wam.Cli.Commands
         [DllImport("kernel32.dll")]
         private static extern IntPtr GetConsoleWindow();
 
+        [DllImport("libX11")]
+        private static extern IntPtr XOpenDisplay(IntPtr display);
+
+        [DllImport("libX11")]
+        private static extern IntPtr XDefaultRootWindow(IntPtr display);
+
+        private static IntPtr GetLinuxConsoleWindow()
+        {
+            try
+            {
+                IntPtr display = XOpenDisplay(IntPtr.Zero);
+
+                return display == IntPtr.Zero ? IntPtr.Zero : XDefaultRootWindow(display);
+            }
+            catch (DllNotFoundException)
+            {
+                return IntPtr.Zero;
+            }
+            catch (EntryPointNotFoundException)
+            {
+                return IntPtr.Zero;
+            }
+        }
+
         private async Task<AuthenticationResult> AcquireTokenAsync(IPublicClientApplication app, IAccount account, IEnumerable<string> scopes)
         {
             AuthenticationResult authResult;
@@ -110,14 +170,34 @@ namespace MilkyWare.Wam.Cli.Commands
                 authResult = await app.AcquireTokenSilent(scopes, account)
                     .ExecuteAsync();
             }
-            catch (MsalUiRequiredException ex)
+            catch (MsalUiRequiredException)
             {
-                _logger.LogDebug("Getting token interactively");
-                authResult = await app.AcquireTokenInteractive(scopes)
-                    .ExecuteAsync();
+                authResult = await AcquireTokenInteractiveAsync(app, scopes);
             }
 
             return authResult;
+        }
+
+        private async Task<AuthenticationResult> AcquireTokenInteractiveAsync(IPublicClientApplication app, IEnumerable<string> scopes)
+        {
+            _logger.LogDebug("Getting token interactively");
+
+            var mainThreadScheduler = MacMainThreadScheduler.Instance();
+            if (!OperatingSystem.IsMacOS() || !mainThreadScheduler.IsRunning() || mainThreadScheduler.IsCurrentlyOnMainThread())
+            {
+                return await app.AcquireTokenInteractive(scopes)
+                    .ExecuteAsync();
+            }
+
+            AuthenticationResult? authResult = null;
+            await mainThreadScheduler.RunOnMainThreadAsync(async () =>
+            {
+                authResult = await app.AcquireTokenInteractive(scopes)
+                    .ExecuteAsync()
+                    .ConfigureAwait(false);
+            }).ConfigureAwait(false);
+
+            return authResult ?? throw new InvalidOperationException("Interactive authentication did not return a result.");
         }
 
         #endregion Private Helpers

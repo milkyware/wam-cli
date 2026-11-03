@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Identity.Client.Utils;
 using MilkyWare.Wam.Cli;
 using MilkyWare.Wam.Cli.Commands;
 using MilkyWare.Wam.Cli.Interceptors;
@@ -32,4 +33,16 @@ app.Configure(configure =>
 #endif
 });
 
-app.Run(args);
+// The macOS broker requires interactive calls on the main thread, so the command runs in the
+// background while the main thread pumps the MacMainThreadScheduler message loop.
+if (OperatingSystem.IsMacOS())
+{
+    var mainThreadScheduler = MacMainThreadScheduler.Instance();
+    var runTask = Task.Run(() => app.Run(args));
+    _ = runTask.ContinueWith(_ => mainThreadScheduler.Stop(), TaskScheduler.Default);
+    mainThreadScheduler.StartMessageLoop();
+
+    return runTask.GetAwaiter().GetResult();
+}
+
+return app.Run(args);

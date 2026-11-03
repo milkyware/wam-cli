@@ -13,7 +13,7 @@
     <ToolCommandName>milkyware-wam-cli</ToolCommandName>
     <Title>MilkyWare WAM CLI</Title>
     <Authors>MilkyWare</Authors>
-    <Description>Command line wrapper for generating access tokens using MSAL.NET WAM</Description>
+    <Description>Command line wrapper for generating access tokens using the MSAL.NET broker</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/milkyware/wam-cli</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>

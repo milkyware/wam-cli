@@ -2,10 +2,10 @@
 
 ## What this is
 
-- .NET 10 global tool (`milkyware-wam-cli`) that acquires an access token through the Windows WAM broker and prints it as JSON.
+- .NET 10 global tool (`milkyware-wam-cli`) that acquires an access token through the platform authentication broker and prints it as JSON.
 - Target framework is `net10.0` (SDK 10.0.x, unpinned; there is no `global.json`).
 - One project: `src/MilkyWare.Wam.Cli`; solution file is `MilkyWare.Wam.Cli.slnx`. There is no test project.
-- Runtime is effectively Windows-only: the WAM broker and the `user32.dll` P/Invoke in `GetAccessTokenCommand` require Windows, even though CI builds on Ubuntu.
+- Runs on Windows, Linux and macOS. `GetBrokerOperatingSystem` maps `OperatingSystem.IsWindows/IsLinux/IsMacOS` to `BrokerOptions.OperatingSystems`, and throws `PlatformNotSupportedException` elsewhere. The `user32.dll`/`kernel32.dll` P/Invokes are Windows-only and the `libX11` P/Invokes are Linux-only, so neither is called on the other platforms.
 
 ## Commands
 
@@ -25,7 +25,8 @@ dotnet pack src/MilkyWare.Wam.Cli
 - `Program.cs` wires Spectre.Console.Cli to Microsoft DI through the custom `TypeRegistrar`/`TypeResolver`; register services in `Program.cs` and inject command dependencies through the constructor.
 - The single command is `Commands/GetAccessTokenCommand.cs`; its options live in `GetAccessTokenSettings.cs`. Settings derive from `LoggingSettings` so the interceptor can see them.
 - Logging is Serilog, default level Warning. `--debug` changes the static `LoggingInterceptor.LogLevel` to Verbose; a settings class that does not derive from `LoggingSettings` will not get that behavior.
-- Token cache is `%LOCALAPPDATA%\.wam-cli\msal.contoso.cache`; `--clear-cache` removes all cached accounts before acquisition.
+- Token cache is `MsalCacheHelper.UserRootDirectory/.wam-cli/msal.contoso.cache` (on Windows `%LOCALAPPDATA%\.wam-cli\msal.contoso.cache`); `--clear-cache` removes all cached accounts before acquisition. The storage properties must chain `.WithLinuxKeyring(...)` and `.WithMacKeyChain(...)`; without the Linux keyring config, `MsalCacheHelper.CreateAsync` throws `ArgumentNullException (attributeKey1)` from `LinuxKeyringAccessor`.
+- macOS broker flows must run interactive calls on the main thread, so `Program.cs` starts `MacMainThreadScheduler.StartMessageLoop()` on the main thread and runs `app.Run(args)` on a background task; `AcquireTokenInteractiveAsync` marshals through `RunOnMainThreadAsync` when the loop is running. macOS also uses the `msauth.com.msauth.unsignedapp://auth` redirect URI and sets no parent window handle.
 - The scope default in code is `https://graph.microsoft.com/.default` (repeated `-s` flags append). The README help output mentioning `User.Read` is stale; trust `GetAccessTokenSettings`.
 
 ## Conventions and releases
