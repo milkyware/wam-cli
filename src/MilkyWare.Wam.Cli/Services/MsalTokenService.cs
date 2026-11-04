@@ -3,17 +3,31 @@ using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Broker;
 using Microsoft.Identity.Client.Extensions.Msal;
 using Microsoft.Identity.Client.Utils;
-using Microsoft.IdentityModel.Abstractions;
-using Microsoft.IdentityModel.LoggingExtensions;
 using MilkyWare.Wam.Cli.Commands;
 
 namespace MilkyWare.Wam.Cli.Services
 {
     public sealed class MsalTokenService(
         ILogger<MsalTokenService> logger,
-        IBrokerPlatform brokerPlatform,
-        IIdentityLogger identityLogger) : ITokenService
+        IBrokerPlatform brokerPlatform) : ITokenService
     {
+        /// <summary>
+        /// MSAL messages that describe expected control flow rather than a fault. They are logged at
+        /// debug level so real errors and warnings stay visible. Revisit on MSAL upgrades, as this
+        /// matches on message text.
+        /// </summary>
+        private static readonly string[] s_benignSignatures =
+        [
+            "wam_no_account_for_id",
+            "AccountNotFound",
+            "MsalUiRequiredException",
+            "TryNormalizeRealm",
+            "MsaDeviceOperationProvider",
+            "ParsePipeDelimitedClientData",
+            "ReadAccountById",
+            "CalculateSuggestedCacheExpiry",
+        ];
+
         public async Task<string?> AcquireAccessTokenAsync(GetAccessTokenSettings settings, CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(settings.ClientId);
@@ -21,7 +35,7 @@ namespace MilkyWare.Wam.Cli.Services
             logger.LogDebug("Building client app");
             var builder = PublicClientApplicationBuilder.Create(settings.ClientId)
                 .WithBroker(new BrokerOptions(brokerPlatform.BrokerOperatingSystem))
-                .WithLogging(identityLogger, false)
+                .WithLogging(LogMsal, Microsoft.Identity.Client.LogLevel.Verbose, enablePiiLogging: false)
                 .WithDefaultRedirectUri();
 
             if (brokerPlatform.ParentWindowFunc is { } parentWindowFunc)
@@ -79,6 +93,28 @@ namespace MilkyWare.Wam.Cli.Services
                 logger.LogWarning("Authentication was cancelled");
                 return null;
             }
+        }
+
+        private void LogMsal(Microsoft.Identity.Client.LogLevel level, string message, bool containsPii)
+        {
+            if (containsPii)
+                return;
+
+            var logLevel = level switch
+            {
+                Microsoft.Identity.Client.LogLevel.Error => Microsoft.Extensions.Logging.LogLevel.Error,
+                Microsoft.Identity.Client.LogLevel.Warning => Microsoft.Extensions.Logging.LogLevel.Warning,
+                Microsoft.Identity.Client.LogLevel.Info => Microsoft.Extensions.Logging.LogLevel.Information,
+                _ => Microsoft.Extensions.Logging.LogLevel.Debug,
+            };
+
+            if (!s_benignSignatures.Any(signature => message.Contains(signature, StringComparison.OrdinalIgnoreCase)))
+            {
+                logger.Log(logLevel, "{Message}", message);
+                return;
+            }
+
+            logger.LogDebug("{Message}", message);
         }
 
         private async Task<AuthenticationResult> AcquireTokenSilentAsync(IPublicClientApplication app, IAccount account, IEnumerable<string> scopes, CancellationToken cancellationToken)
