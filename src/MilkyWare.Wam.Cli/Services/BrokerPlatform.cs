@@ -6,8 +6,6 @@ namespace MilkyWare.Wam.Cli.Services
 {
     public sealed class BrokerPlatform(IOperatingSystem operatingSystem) : IBrokerPlatform
     {
-        private const string MacOsUnsignedAppRedirectUri = "msauth.com.msauth.unsignedapp://auth";
-
         private enum GetAncestorFlags
         {
             GetParent = 1,
@@ -19,16 +17,9 @@ namespace MilkyWare.Wam.Cli.Services
         {
             Platform.Windows => BrokerOptions.OperatingSystems.Windows,
             Platform.Linux => BrokerOptions.OperatingSystems.Linux,
-            Platform.MacOS => BrokerOptions.OperatingSystems.OSX,
             _ => throw new PlatformNotSupportedException("The broker is not supported on the current operating system."),
         };
 
-        // The macOS broker requires the unsigned executable redirect URI for console apps.
-        public string? RedirectUri => BrokerOperatingSystem == BrokerOptions.OperatingSystems.OSX
-            ? MacOsUnsignedAppRedirectUri
-            : null;
-
-        // macOS broker flows do not support a parent window handle, so only Windows and Linux set one.
         public Func<IntPtr>? ParentWindowFunc => BrokerOperatingSystem switch
         {
             BrokerOptions.OperatingSystems.Windows => GetConsoleOrTerminalWindow,

@@ -21,16 +21,8 @@ namespace MilkyWare.Wam.Cli.Services
             logger.LogDebug("Building client app");
             var builder = PublicClientApplicationBuilder.Create(settings.ClientId)
                 .WithBroker(new BrokerOptions(brokerPlatform.BrokerOperatingSystem))
-                .WithLogging(identityLogger);
-
-            if (brokerPlatform.RedirectUri is { } redirectUri)
-            {
-                builder.WithRedirectUri(redirectUri);
-            }
-            else
-            {
-                builder.WithDefaultRedirectUri();
-            }
+                .WithLogging(identityLogger, false)
+                .WithDefaultRedirectUri();
 
             if (brokerPlatform.ParentWindowFunc is { } parentWindowFunc)
             {
@@ -49,13 +41,11 @@ namespace MilkyWare.Wam.Cli.Services
             var filePath = Path.Combine(MsalCacheHelper.UserRootDirectory, ".wam-cli", "msal.contoso.cache");
             var storageProperties = new StorageCreationPropertiesBuilder(Path.GetFileName(filePath),
                 Path.GetDirectoryName(filePath))
-                .WithLinuxKeyring(
-                    "com.milkyware.wam-cli",
-                    "default",
+                .WithLinuxKeyring("com.milkyware.wam-cli",
+                    MsalCacheHelper.LinuxKeyRingDefaultCollection,
                     "MSALCache",
-                    new KeyValuePair<string, string>("MsalClientID", "Microsoft.Developer.IdentityService"),
-                    new KeyValuePair<string, string>("MsalClientVersion", "1.0.0.0"))
-                .WithMacKeyChain("com.milkyware.wam-cli", "MSALCache")
+                    new("MsalClientID", "Microsoft.Developer.IdentityService"),
+                    new("MsalClientVersion", "1.0.0.0"))
                 .Build();
 
             var cacheHelper = await MsalCacheHelper.CreateAsync(storageProperties);
@@ -109,29 +99,8 @@ namespace MilkyWare.Wam.Cli.Services
         {
             logger.LogDebug("Getting token interactively");
 
-            if (brokerPlatform.BrokerOperatingSystem != BrokerOptions.OperatingSystems.OSX)
-            {
-                return await app.AcquireTokenInteractive(scopes)
-                    .ExecuteAsync(cancellationToken);
-            }
-
-            // The macOS broker requires interactive calls on the main thread.
-            var mainThreadScheduler = MacMainThreadScheduler.Instance();
-            if (!mainThreadScheduler.IsRunning() || mainThreadScheduler.IsCurrentlyOnMainThread())
-            {
-                return await app.AcquireTokenInteractive(scopes)
-                    .ExecuteAsync(cancellationToken);
-            }
-
-            AuthenticationResult? authResult = null;
-            await mainThreadScheduler.RunOnMainThreadAsync(async () =>
-            {
-                authResult = await app.AcquireTokenInteractive(scopes)
-                    .ExecuteAsync(cancellationToken)
-                    .ConfigureAwait(false);
-            }).ConfigureAwait(false);
-
-            return authResult ?? throw new InvalidOperationException("Interactive authentication did not return a result.");
+            return await app.AcquireTokenInteractive(scopes)
+                .ExecuteAsync(cancellationToken);
         }
     }
 }

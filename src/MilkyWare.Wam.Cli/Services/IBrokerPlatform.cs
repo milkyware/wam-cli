@@ -10,11 +10,6 @@ namespace MilkyWare.Wam.Cli.Services
         BrokerOptions.OperatingSystems BrokerOperatingSystem { get; }
 
         /// <summary>
-        /// Gets the redirect URI required by the platform broker, or <see langword="null"/> to use the MSAL default.
-        /// </summary>
-        string? RedirectUri { get; }
-
-        /// <summary>
         /// Gets the parent window handle provider for the interactive prompt, or <see langword="null"/> when unsupported.
         /// </summary>
         Func<IntPtr>? ParentWindowFunc { get; }
