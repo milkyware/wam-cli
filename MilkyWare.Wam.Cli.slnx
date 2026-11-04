@@ -2,4 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/MilkyWare.Wam.Cli/MilkyWare.Wam.Cli.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MilkyWare.Wam.CliTests/MilkyWare.Wam.CliTests.csproj" />
+  </Folder>
 </Solution>
