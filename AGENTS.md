@@ -5,7 +5,7 @@
 - .NET 10 global tool (`milkyware-wam-cli`) that acquires an access token through the platform authentication broker and prints it as JSON.
 - Target framework is `net10.0` (SDK 10.0.x, unpinned; there is no `global.json`).
 - One project: `src/MilkyWare.Wam.Cli`; solution file is `MilkyWare.Wam.Cli.slnx`. There is no test project.
-- Runs on Windows, Linux and macOS. `GetBrokerOperatingSystem` maps `OperatingSystem.IsWindows/IsLinux/IsMacOS` to `BrokerOptions.OperatingSystems`, and throws `PlatformNotSupportedException` elsewhere. The `user32.dll`/`kernel32.dll` P/Invokes are Windows-only and the `libX11` P/Invokes are Linux-only, so neither is called on the other platforms.
+- Runs on Windows and Linux. `BrokerPlatform` maps `Enums.Platform` to `BrokerOptions.OperatingSystems` and throws `PlatformNotSupportedException` for any other OS. The `user32.dll`/`kernel32.dll` P/Invokes are Windows-only and the `libX11` P/Invokes are Linux-only, so neither is called on the other platform.
 
 ## Commands
 
@@ -23,10 +23,13 @@ dotnet pack src/MilkyWare.Wam.Cli
 ## Architecture
 
 - `Program.cs` wires Spectre.Console.Cli to Microsoft DI through the custom `TypeRegistrar`/`TypeResolver`; register services in `Program.cs` and inject command dependencies through the constructor.
-- The single command is `Commands/GetAccessTokenCommand.cs`; its options live in `GetAccessTokenSettings.cs`. Settings derive from `LoggingSettings` so the interceptor can see them.
+- `Services/` holds the MSAL logic: `IBrokerPlatform` maps the current `Enums.Platform` to `BrokerOptions.OperatingSystems` and supplies the parent-window P/Invokes, `ITokenService`/`MsalTokenService` builds the client app, configures the cache, and performs silent/interactive acquisition (returning the access token, or `null` when the user cancels), and `IOperatingSystem` (`HostOs`) reports the host `Platform` as the test seam over the static `OperatingSystem` checks. Register them through `AddWamCliServices` in `ServiceCollectionExtensions` (namespace `MilkyWare.Extensions.DependencyInjection`), which also registers `LoggingInterceptor`.
+- The single command is `Commands/GetAccessTokenCommand.cs`, which validates the client ID, delegates to `ITokenService`, and writes the JSON; its options live in `GetAccessTokenSettings.cs`. Settings derive from `LoggingSettings` so the interceptor can see them.
 - Logging is Serilog, default level Warning. `--debug` changes the static `LoggingInterceptor.LogLevel` to Verbose; a settings class that does not derive from `LoggingSettings` will not get that behavior.
-- Token cache is `MsalCacheHelper.UserRootDirectory/.wam-cli/msal.contoso.cache` (on Windows `%LOCALAPPDATA%\.wam-cli\msal.contoso.cache`); `--clear-cache` removes all cached accounts before acquisition. The storage properties must chain `.WithLinuxKeyring(...)` and `.WithMacKeyChain(...)`; without the Linux keyring config, `MsalCacheHelper.CreateAsync` throws `ArgumentNullException (attributeKey1)` from `LinuxKeyringAccessor`.
-- macOS broker flows must run interactive calls on the main thread, so `Program.cs` starts `MacMainThreadScheduler.StartMessageLoop()` on the main thread and runs `app.Run(args)` on a background task; `AcquireTokenInteractiveAsync` marshals through `RunOnMainThreadAsync` when the loop is running. macOS also uses the `msauth.com.msauth.unsignedapp://auth` redirect URI and sets no parent window handle.
+- Token cache is `MsalCacheHelper.UserRootDirectory/.wam-cli/msal.contoso.cache` (on Windows `%LOCALAPPDATA%\.wam-cli\msal.contoso.cache`); `--clear-cache` removes all cached accounts before acquisition. The storage properties must chain `.WithLinuxKeyring(...)`; without it, `MsalCacheHelper.CreateAsync` throws `ArgumentNullException (attributeKey1)` from `LinuxKeyringAccessor`.
+- The Linux broker's native store (`Msai::SecureStorage` in `libmsalruntime.so`) hardcodes the Secret Service collection `login` and never creates it. WSL has no PAM login to provision it, so without a `login` keyring every broker write fails (`WriteNoLock ... /collection/login`) and nothing persists — runs keep prompting. Our own cache uses the `default` collection and is unaffected.
+- Silent acquisition is only attempted when `GetAccountsAsync` returns an account. With no cached account the Linux broker blocks inside its background request instead of throwing `MsalUiRequiredException`, so `MsalTokenService` goes straight to interactive.
+- MSAL itself logs through the `LogCallback` overload of `WithLogging` with PII logging off. Messages matching `s_benignSignatures` in `MsalTokenService` are demoted to debug because they describe expected control flow; revisit that list on MSAL upgrades since it matches on message text.
 - The scope default in code is `https://graph.microsoft.com/.default` (repeated `-s` flags append). The README help output mentioning `User.Read` is stale; trust `GetAccessTokenSettings`.
 
 ## Conventions and releases

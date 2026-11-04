@@ -13,21 +13,21 @@
 
 ## Overview
 
-WAM CLI is a command-line tool for generating access tokens using the Microsoft Authentication Library (MSAL) and the platform authentication broker (Windows Web Account Manager, Microsoft single sign-on for Linux, or the macOS broker). It simplifies authentication for scripts and applications by centralizing token generation, supporting both silent and interactive flows.
+WAM CLI is a command-line tool for generating access tokens using the Microsoft Authentication Library (MSAL) and the platform authentication broker (Windows Web Account Manager or Microsoft single sign-on for Linux). It simplifies authentication for scripts and applications by centralizing token generation, supporting both silent and interactive flows.
 
 ## Key Features
 
 - Support for single and multi tenancy app registrations
 - Simplifies authentication by handling token caching and interactive logins
 - Outputs tokens in JSON format for easy integration with scripts
-- Runs on Windows, Linux and macOS, using each platform's authentication broker
+- Runs on Windows and Linux, using each platform's authentication broker
 
 ## Requirements
 
-- Windows 10 or later, Linux, or macOS 10.15 or later. Token acquisition uses the platform authentication broker, which is selected automatically at runtime.
+- Windows 10 or later, or Linux. Token acquisition uses the platform authentication broker, which is selected automatically at runtime.
   - **Windows** uses the Web Account Manager (WAM) broker, which is built into the OS.
-  - **Linux** requires the [Microsoft single sign-on for Linux](https://learn.microsoft.com/entra/msal/dotnet/acquiring-tokens/desktop-mobile/linux-dotnet-sdk) broker (`sudo apt install microsoft-identity-broker`) plus `libsecret` and `libx11`. The `https://login.microsoftonline.com/common/oauth2/nativeclient` redirect URI must be enabled on the app registration.
-  - **macOS** requires the Company Portal app, and the device must be enrolled. The `msauth.com.msauth.unsignedapp://auth` redirect URI must be enabled on the app registration.
+  - **Linux** requires the Microsoft single sign-on for Linux broker plus the `libsecret`, `libx11` and `webkit2gtk` native dependencies. Enabling the `https://login.microsoftonline.com/common/oauth2/nativeclient` redirect URI on the app registration is recommended, and is required if the broker prompts fail with a redirect URI error. See [Enable SSO in native Linux apps](https://learn.microsoft.com/entra/msal/dotnet/acquiring-tokens/desktop-mobile/linux-dotnet-sdk).
+  - **WSL** requires WSL 2.4.13 or later with WSLg. The broker stores its session in the Secret Service collection named `login`, which is not created automatically under WSL, so create and unlock a keyring named `login` (for example with `seahorse`) before the first run. See [Using MSAL.NET with WSL](https://learn.microsoft.com/entra/msal/dotnet/acquiring-tokens/desktop-mobile/linux-dotnet-sdk-wsl) for the package list and setup order.
 - The [.NET 10](https://dotnet.microsoft.com/download/dotnet/10.0) SDK or runtime. The SDK is required to install the tool; the runtime is required to run it.
 - An app registration in Microsoft Entra ID that supports broker authentication. See the [MSAL broker documentation](https://learn.microsoft.com/entra/msal/dotnet/acquiring-tokens/desktop-mobile/wam).
 
@@ -122,5 +122,5 @@ The **launchSettings.json** file is ignored from the repository to avoid IDs bei
 - [Spectre.Console](https://spectreconsole.net/)
 - [MSAL WAM Broker](https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/wam)
 - [MSAL broker on Linux](https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/linux-dotnet-sdk)
-- [MSAL macOS broker](https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/macos-broker-dotnet-sdk)
+- [MSAL broker on WSL](https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/linux-dotnet-sdk-wsl)
 - [MS Identity Sample Repository](https://github.com/Azure-Samples/ms-identity-dotnet-desktop-tutorial)
