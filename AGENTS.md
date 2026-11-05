@@ -3,20 +3,22 @@
 ## What this is
 
 - .NET 10 global tool (`milkyware-wam-cli`) that acquires an access token through the platform authentication broker and prints it as JSON.
-- Target framework is `net10.0` (SDK 10.0.x, unpinned; there is no `global.json`).
-- One project: `src/MilkyWare.Wam.Cli`; solution file is `MilkyWare.Wam.Cli.slnx`. There is no test project.
+- Target framework is `net10.0` (SDK 10.0.x, unpinned). `global.json` only selects the MTP test runner; it pins no SDK version.
+- Two projects: `src/MilkyWare.Wam.Cli` (the tool) and `tests/MilkyWare.Wam.CliTests` (xUnit v3 on MTP); solution file is `MilkyWare.Wam.Cli.slnx`.
 - Runs on Windows and Linux. `BrokerPlatform` maps `Enums.Platform` to `BrokerOptions.OperatingSystems` and throws `PlatformNotSupportedException` for any other OS. The `user32.dll`/`kernel32.dll` P/Invokes are Windows-only and the `libX11` P/Invokes are Linux-only, so neither is called on the other platform.
 
 ## Commands
 
 ```powershell
 dotnet build MilkyWare.Wam.Cli.slnx
+dotnet test MilkyWare.Wam.Cli.slnx
+dotnet test --project tests/MilkyWare.Wam.CliTests --coverlet
 dotnet run --project src/MilkyWare.Wam.Cli --no-launch-profile -- --help
 dotnet run --project src/MilkyWare.Wam.Cli --no-launch-profile -- -c <client-id> [-t <tenant-id>] [-s <scope> ...] [--clear-cache] [--debug]
 dotnet pack src/MilkyWare.Wam.Cli
 ```
 
-- No tests exist; CI (`.github/workflows/ci.yml`) calls the local composite action `.github/actions/build-dotnet` (restore and build, no test step). Do not add a `dotnet test` step expecting coverage.
+- CI (`.github/workflows/ci.yml`) calls the local composite action `.github/actions/build-dotnet` (restore, build, then `dotnet test` without coverage). Coverage (`--coverlet`) is a local option only and writes to `TestResults/`; do not add it to CI without deciding where the artifacts go.
 - `dotnet run` automatically uses the gitignored `src/MilkyWare.Wam.Cli/Properties/launchSettings.json` when it exists, which may contain local client IDs and `--clear-cache`. Pass `--no-launch-profile` for a clean run.
 - A live run needs a real Entra app registration; CI cannot verify token acquisition.
 
@@ -31,6 +33,13 @@ dotnet pack src/MilkyWare.Wam.Cli
 - Silent acquisition is only attempted when `GetAccountsAsync` returns an account. With no cached account the Linux broker blocks inside its background request instead of throwing `MsalUiRequiredException`, so `MsalTokenService` goes straight to interactive.
 - MSAL itself logs through the `LogCallback` overload of `WithLogging` with PII logging off. Messages matching `s_benignSignatures` in `MsalTokenService` are demoted to debug because they describe expected control flow; revisit that list on MSAL upgrades since it matches on message text.
 - The scope default in code is `https://graph.microsoft.com/.default` (repeated `-s` flags append). The README help output mentioning `User.Read` is stale; trust `GetAccessTokenSettings`.
+
+## Tests
+
+- `tests/MilkyWare.Wam.CliTests` is xUnit v3 (`xunit.v3.mtp-v2`) on Microsoft Testing Platform; `global.json`'s `test.runner` selects MTP mode so plain `dotnet test` works on the .NET 10 SDK. `UseMicrosoftTestingPlatformRunner` and `OutputType=Exe` are required for the native runner.
+- Test classes mirror the component folder (`Services/`, `DependencyInjection/`) and namespaces add `.Tests`. Use NSubstitute for mocks and FluentAssertions for assertions, build mocks plus the SUT in the constructor as private readonly fields, expose the ambient token through a `CancellationToken => _contextAccessor.Current.CancellationToken` getter (`ITestContextAccessor` is constructor-injected), and write every test as Arrange/Act/Assert.
+- `MsalTokenService.LogMsal` is `internal` with `InternalsVisibleTo("MilkyWare.Wam.CliTests")` so the log demotion matrix is testable; the rest of `AcquireAccessTokenAsync` is covered by live broker runs instead of mocks.
+- Coverage uses `coverlet.MTP` via `dotnet test --coverlet` (add `--coverlet-output-format cobertura` for reports in `TestResults/`); it is not part of CI.
 
 ## Conventions and releases
 
