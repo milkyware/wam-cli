@@ -95,7 +95,7 @@ namespace MilkyWare.Wam.Cli.Services
             }
         }
 
-        private void LogMsal(Microsoft.Identity.Client.LogLevel level, string message, bool containsPii)
+        internal void LogMsal(Microsoft.Identity.Client.LogLevel level, string message, bool containsPii)
         {
             if (containsPii)
                 return;
