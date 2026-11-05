@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.1](https://github.com/milkyware/wam-cli/compare/v0.1.0...v0.1.1) (2026-11-05)
+
+
+### 🚀 Enhancements
+
+* added support for running on linux ([#75](https://github.com/milkyware/wam-cli/issues/75)) ([538f71f](https://github.com/milkyware/wam-cli/commit/538f71f0156986c892964323ca59116da0be6484))
+
+
+### 🧹 Maintenance
+
+* added `CODEOWNERS` ([42372d0](https://github.com/milkyware/wam-cli/commit/42372d04f08510edd20e9cb0beec44fd4579ac59))
+* **deps:** update actions/setup-dotnet digest to 0f4a354 ([#73](https://github.com/milkyware/wam-cli/issues/73)) ([5f19eed](https://github.com/milkyware/wam-cli/commit/5f19eedaf5dd0ac4c54592b0fd5bca90b7dfa0e9))
+* **deps:** update azure-ad-microsoft-authentication-library-for-dotnet monorepo to 4.91.1 ([#72](https://github.com/milkyware/wam-cli/issues/72)) ([a310ac9](https://github.com/milkyware/wam-cli/commit/a310ac94a4a3e3e9039a51e958118796e88d54a8))
+
 ## [0.1.0](https://github.com/milkyware/wam-cli/compare/v0.0.10...v0.1.0) (2026-11-01)
 
 
