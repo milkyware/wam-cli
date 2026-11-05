@@ -1,5 +1,5 @@
 name: Build Dotnet
-description: Sets up the .NET SDK, restores the solution, and builds it.
+description: Sets up the .NET SDK, restores the solution, builds it, and runs the tests.
 
 inputs:
   dotnet-version:
@@ -41,3 +41,14 @@ runs:
           --nologo `
           --verbosity minimal `
           --no-restore
+
+    - name: Test
+      shell: pwsh
+      env:
+        BUILD_CONFIGURATION: ${{ inputs.build-configuration }}
+      run: |
+        dotnet test `
+          -c $env:BUILD_CONFIGURATION `
+          --nologo `
+          --verbosity minimal `
+          --no-build
