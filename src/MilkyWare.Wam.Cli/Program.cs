@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using MilkyWare.Extensions.DependencyInjection;
 using MilkyWare.Wam.Cli;
 using MilkyWare.Wam.Cli.Commands;
 using MilkyWare.Wam.Cli.Interceptors;
@@ -14,7 +15,7 @@ services.AddLogging(builder =>
         .WriteTo.Console(theme: AnsiConsoleTheme.Literate)
         .CreateLogger());
 });
-services.AddTransient<ICommandInterceptor, LoggingInterceptor>();
+services.AddWamCliServices();
 var registrar = new TypeRegistrar(services);
 var app = new CommandApp<GetAccessTokenCommand>(registrar);
 app.Configure(configure =>
@@ -32,4 +33,4 @@ app.Configure(configure =>
 #endif
 });
 
-app.Run(args);
+return app.Run(args);
