@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/milkyware/wam-cli/compare/v0.1.1...v0.1.2) (2026-11-12)
+
+
+### 🧹 Maintenance
+
+* **deps:** update azure-ad-microsoft-authentication-library-for-dotnet monorepo to 4.92.0 ([#76](https://github.com/milkyware/wam-cli/issues/76)) ([042329c](https://github.com/milkyware/wam-cli/commit/042329c8f8f25a393c117b23b66462adea9fc209))
+
 ## [0.1.1](https://github.com/milkyware/wam-cli/compare/v0.1.0...v0.1.1) (2026-11-05)
 
 
