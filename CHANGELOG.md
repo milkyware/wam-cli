@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.2](https://github.com/milkyware/wam-cli/compare/v0.1.1...v0.1.2) (2026-11-23)
+
+
+### 🧹 Maintenance
+
+* **deps:** update actions/setup-dotnet action to v6.1.0 ([#78](https://github.com/milkyware/wam-cli/issues/78)) ([8495936](https://github.com/milkyware/wam-cli/commit/84959363eaa7a20261218bdf961d5285f6c1acf2))
+* **deps:** update amannn/action-semantic-pull-request action to v6.1.2 ([#79](https://github.com/milkyware/wam-cli/issues/79)) ([6901d1e](https://github.com/milkyware/wam-cli/commit/6901d1e8eca6a563ffbc74d13a8ac3e748338421))
+* **deps:** update azure-ad-microsoft-authentication-library-for-dotnet monorepo to 4.92.0 ([#76](https://github.com/milkyware/wam-cli/issues/76)) ([042329c](https://github.com/milkyware/wam-cli/commit/042329c8f8f25a393c117b23b66462adea9fc209))
+* **deps:** update dependency xunit.v3.mtp-v2 to 4.0.3 ([#80](https://github.com/milkyware/wam-cli/issues/80)) ([a684a80](https://github.com/milkyware/wam-cli/commit/a684a80f5bba35f98adfebb37774cebf7a39b784))
+
 ## [0.1.1](https://github.com/milkyware/wam-cli/compare/v0.1.0...v0.1.1) (2026-11-05)
 
 
